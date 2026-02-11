@@ -1,18 +1,17 @@
+import { Routes, Route } from "react-router-dom";
+import Profile from "./Profile";
+import Messaging from "./Messaging";
 import Login from "./Login_SignUp";
 
-function App() {
+export default function App() {
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100vh",
-      width: "100vw",
-      backgroundColor: "#4f9dff"
-    }}>
-      <Login />
-    </div>
+    <Routes>
+      {/* Temporary: show login first */}
+      <Route path="/" element={<Login />} />
+
+      {/* Teammates' pages */}
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/messaging" element={<Messaging />} />
+    </Routes>
   );
 }
-
-export default App;
