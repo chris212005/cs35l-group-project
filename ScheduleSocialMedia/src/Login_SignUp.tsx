@@ -9,16 +9,31 @@ export default function Login() {
   }
   `;
 
+  const buttonStyle: React.CSSProperties = {
+    margin: "10px",
+    width: "120px",
+    padding: "10px 14px",
+    borderRadius: "10px",
+    border: "none",
+    backgroundColor: "#111827",
+    color: "white",
+    fontWeight: 600,
+    cursor: "pointer",
+    opacity: 1,
+    filter: "none",
+    pointerEvents: "auto",
+  };
+
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center", // centers horizontally
-        justifyContent: "center", // centers vertically
-        height: "100vh", // full screen height
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
         textAlign: "center",
-        backgroundColor: "#4f9dff", // (different codes for different colors) blue background
+        backgroundColor: "#4f9dff",
       }}
     >
       {/* THIS LOADS ANIMATION INTO THE PAGE */}
@@ -29,8 +44,8 @@ export default function Login() {
           backgroundColor: "white",
           padding: "30px",
           borderRadius: "12px",
-          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.18)", // softer glow
-          border: "2px solid #d1d5db", // nice neutral gray
+          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.18)",
+          border: "2px solid #d1d5db",
         }}
       >
         <h1 style={{ color: "#454545" }}>Login / Sign Up</h1>
@@ -56,9 +71,17 @@ export default function Login() {
           You must use your UCLA email (g.ucla.edu) to sign up or log in.
         </p>
 
-        <button style={{ margin: "10px", width: "120px" }}>Log In</button>
+        <button
+          style={buttonStyle}
+        >
+          Log In
+        </button>
 
-        <button style={{ margin: "10px", width: "120px" }}>Sign Up</button>
+        <button
+          style={buttonStyle}
+        >
+          Sign Up
+        </button>
 
         {/*
           Eventually clicking either button should route the user to the profile page.
