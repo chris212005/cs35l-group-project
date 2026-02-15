@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const styles = `
@@ -23,6 +24,8 @@ export default function Login() {
     filter: "none",
     pointerEvents: "auto",
   };
+
+  const navigate = useNavigate();
 
   return (
     <div
@@ -71,15 +74,11 @@ export default function Login() {
           You must use your UCLA email (g.ucla.edu) to sign up or log in.
         </p>
 
-        <button
-          style={buttonStyle}
-        >
+        <button style={buttonStyle} onClick={() => navigate("/login")}>
           Log In
         </button>
 
-        <button
-          style={buttonStyle}
-        >
+        <button style={buttonStyle} onClick={() => navigate("/signup")}>
           Sign Up
         </button>
 
