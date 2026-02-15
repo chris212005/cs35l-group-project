@@ -1,8 +1,30 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+//import { signupUser } from "./apiCalls/auth";
 
 export default function SignUpPage() {
   const navigate = useNavigate();
+
+  const [user, setUser] = React.useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+  });
+
+  function onFormSubmit() {
+    // Call the signup API with user data
+    // signupUser(user)
+    //   .then((response) => {
+    //     // Handle successful signup (e.g., navigate to profile)
+    //     navigate("/profile");
+    //   })
+    //   .catch((error) => {
+    //     // Handle signup error (e.g., show error message)
+    //     console.error("Signup failed:", error);
+    //   });
+    console.log("Form submitted with user data:", user);
+  }
 
   const inputStyle: React.CSSProperties = {
     width: "260px",
@@ -53,59 +75,71 @@ export default function SignUpPage() {
           Use your UCLA email to sign up
         </p>
 
-        <input
-          type="text"
-          placeholder="Full Name"
-          style={inputStyle}
-        />
-
-        <br />
-
-        <input
-          type="email"
-          placeholder="UCLA Email"
-          style={inputStyle}
-        />
-
-        <br />
-
-        <input
-          type="password"
-          placeholder="Password"
-          style={inputStyle}
-        />
-
-        <br />
-
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          style={inputStyle}
-        />
-
-        <br />
-
-        <button
-          style={buttonStyle}
-          onClick={() => navigate("/profile")}
-        >
-          Sign Up
-        </button>
-
-        <br />
-
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            marginTop: "15px",
-            background: "none",
-            border: "none",
-            color: "#2563eb",
-            cursor: "pointer",
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onFormSubmit();
           }}
-        >
-          ← Back
-        </button>
+          >
+          <input
+            type="text"
+            placeholder="First Name"
+            style={inputStyle}
+            value = {user.firstname}
+            onChange = {(e) => setUser({...user, firstname: e.target.value})}
+          />
+
+          <input
+            type="text"
+            placeholder="Last Name"
+            style={inputStyle}
+            value = {user.lastname}
+            onChange = {(e) => setUser({...user, lastname: e.target.value})}
+          />
+
+          <br />
+
+          <input
+            type="email"
+            placeholder="UCLA Email"
+            style={inputStyle}
+            value = {user.email}
+            onChange = {(e) => setUser({...user, email: e.target.value})}
+          />
+
+          <br />
+
+          <input
+            type="password"
+            placeholder="Password"
+            style={inputStyle}
+            value = {user.password}
+            onChange = {(e) => setUser({...user, password: e.target.value})}
+          />
+
+          <button
+            type = "submit"
+            style={buttonStyle}
+            onClick={() => navigate("/profile")}
+          >
+            Sign Up
+          </button>
+
+          <br />
+
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              marginTop: "15px",
+              background: "none",
+              border: "none",
+              color: "#2563eb",
+              cursor: "pointer",
+            }}
+          >
+            ← Back
+          </button>
+        </form>
       </div>
     </div>
   );

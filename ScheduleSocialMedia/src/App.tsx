@@ -19,7 +19,7 @@ export default function App() {
   {/* profile & messaging pages */}
   <Route path="/profile" element={<Profile />} />
   <Route path="/messaging" element={<Messaging />} />
-  <Route path="/find-users" element={<FindUsers />} />
+  {/*<Route path="/find-users" element={<FindUsers />} />*/}
 </Routes>
 
   
