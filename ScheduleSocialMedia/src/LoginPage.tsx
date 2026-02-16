@@ -1,8 +1,32 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "./apiCalls/auth";
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+
+  const[user, setuser] = React.useState({
+    email: "",
+    password: "",
+  });
+
+  async function onFormSubmit() {
+    try{
+      const response = await loginUser(user);
+      if(response.success){
+        toast.success(response.message);
+        localStorage.setItem('token', response.token);
+        navigate("/profile")
+      }
+      else{
+        toast.error(response.message);
+      }
+    }
+    catch(err){
+      toast.error(err instanceof Error ? err.message : "An unknown error occurred");
+    }
+  }
 
   const inputStyle: React.CSSProperties = {
     width: "260px",
@@ -51,18 +75,33 @@ export default function LoginPage() {
           Enter your UCLA email to continue
         </p>
 
-        <input type="email" placeholder="UCLA Email" style={inputStyle} />
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            onFormSubmit();}}
+        >
+        <input type="email" 
+        placeholder="UCLA Email" 
+        style={inputStyle} 
+        value = {user.email}
+        onChange={ (e) => setuser({...user, email: e.target.value})}
+        />
 
         <br />
 
-        <input type="password" placeholder="Password" style={inputStyle} />
-
+        <input type="password" 
+        placeholder="Password" 
+        style={inputStyle} 
+        value = {user.password}
+        onChange={ (e) => setuser({...user, password: e.target.value})}
+        />
+        
         <br />
 
-        <button style={buttonStyle} onClick={() => navigate("/profile")}>
+        <button style={buttonStyle}>
           Log In
         </button>
-
+        
         <br />
 
         <button
@@ -77,6 +116,7 @@ export default function LoginPage() {
         >
           ← Back
         </button>
+        </form>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-//import { signupUser } from "./apiCalls/auth";
+import { signupUser } from "./apiCalls/auth";
+import toast from 'react-hot-toast';
 
 export default function SignUpPage() {
   const navigate = useNavigate();
@@ -12,18 +13,20 @@ export default function SignUpPage() {
     password: "",
   });
 
-  function onFormSubmit() {
-    // Call the signup API with user data
-    // signupUser(user)
-    //   .then((response) => {
-    //     // Handle successful signup (e.g., navigate to profile)
-    //     navigate("/profile");
-    //   })
-    //   .catch((error) => {
-    //     // Handle signup error (e.g., show error message)
-    //     console.error("Signup failed:", error);
-    //   });
-    console.log("Form submitted with user data:", user);
+  async function onFormSubmit() {
+    try{
+      const response = await signupUser(user);
+      if(response.success){
+        toast.success(response.message);
+        navigate("/profile")
+      }
+      else{
+        toast.error(response.message);
+      }
+    }
+    catch(err){
+      toast.error(err instanceof Error ? err.message : "An unknown error occurred");
+    }
   }
 
   const inputStyle: React.CSSProperties = {
@@ -120,7 +123,6 @@ export default function SignUpPage() {
           <button
             type = "submit"
             style={buttonStyle}
-            onClick={() => navigate("/profile")}
           >
             Sign Up
           </button>
