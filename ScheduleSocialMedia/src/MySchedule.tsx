@@ -35,7 +35,7 @@ const MySchedule = () => {
     if (imagePreview) {
       setSavedImage(imagePreview);
 
-      // Show saved message
+      // Show saved messages when user clicks save changes
       setShowSavedMessage(true);
     }
   };
