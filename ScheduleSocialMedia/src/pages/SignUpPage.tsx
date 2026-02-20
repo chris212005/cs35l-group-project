@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { signupUser } from "./apiCalls/auth";
+import { signupUser } from "../apiCalls/auth";
 import toast from 'react-hot-toast';
 
 export default function SignUpPage() {

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "./apiCalls/auth";
+import { loginUser } from "../apiCalls/auth";
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {

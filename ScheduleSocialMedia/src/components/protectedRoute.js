@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function ProtectedRoute(children){
+function ProtectedRoute({children}){
     const navigate = useNavigate();
     useEffect(() => {
         if(localStorage.getItem('token')){
@@ -16,7 +16,7 @@ function ProtectedRoute(children){
         <div>
             { children }
         </div>
-    )
+    );
 
 }
 

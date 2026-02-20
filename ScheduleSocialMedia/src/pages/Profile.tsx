@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import TopBar from "./components/TopBar";
-import ProfileCard from "./components/ProfileCard";
-import PeopleSection from "./components/PeopleSection";
+import TopBar from "../components/TopBar";
+import ProfileCard from "../components/ProfileCard";
+import PeopleSection from "../components/PeopleSection";
 import './Profile.css'
 
 export default function Profile() {
