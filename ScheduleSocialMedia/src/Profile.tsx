@@ -1,17 +1,23 @@
-import './Profile.css'
 import { Link } from "react-router-dom";
+import TopBar from "./components/TopBar";
+import ProfileCard from "./components/ProfileCard";
+import PeopleSection from "./components/PeopleSection";
+import './Profile.css'
 
 export default function Profile() {
-
   return (
-    <>
-    <div>
-    <h1>Profile Page</h1>
+    <div className="app">
+      <TopBar />
 
-    <Link to="/messaging">
-      <button>Go to Messaging</button>
-    </Link>
-  </div>
-    </>
-  )
+      <div className="feed">
+        <h1 className="welcome">Welcome to UCLAGRAM</h1>
+        <ProfileCard />
+        <PeopleSection />
+      </div>
+
+      <Link to="/messaging">
+        <button>Go to Messaging</button>
+      </Link>
+    </div>
+  );
 }
