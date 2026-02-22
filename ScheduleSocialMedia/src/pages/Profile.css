@@ -1,10 +1,11 @@
+/* ========= page base ========= */
 .app {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   background: #fafafa;
   min-height: 100vh;
-  padding-bottom: 40px;
 }
 
+/* ========= top bar ========= */
 .topbar {
   height: 60px;
   background: #4f9dff;
@@ -22,156 +23,136 @@
   letter-spacing: 0.2px;
 }
 
-.search {
-  width: 320px;
-  max-width: 40vw;
-  padding: 10px 12px;
-  border: 1px solid #dbdbdb;
-  border-radius: 10px;
-  background: #efefef;
-  outline: none;
-}
-
-.icons {
+/* Messaging / Friend / ... buttons */
+.topTabs {
   display: flex;
+  align-items: center;
   gap: 10px;
 }
 
-.iconCircle {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
+.topTab {
+  text-decoration: none;
   border: 1px solid #dbdbdb;
   background: #f6f6f6;
+  color: #111;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  display: inline-block;
 }
 
-.content {
-  padding: 24px 16px;
+.activeTab {
+  background: white;
 }
 
-.profileCardLarge {
-    display: flex;
-    gap: 45px;
-    align-items: flex-start;
-    background: white;
-    border: 0px solid #dbdbdb;
-    border-radius: 12px;
-    padding: 25px;
-    height: 250px;
+.moreTab {
+  cursor: pointer;
 }
 
+/* ========= layout ========= */
+.layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 22px 16px 40px;
+}
+
+.pageTitle {
+  color: #111;
+  font-size: 34px;
+  font-weight: 800;
+  margin: 12px 0 18px;
+}
+
+/* left pic + right content */
+.profileHeader {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+
+/* ========= profile pic box ========= */
 .profilePicLarge {
-    width: 120px;
-    height: 120px;
-    background: #ddd;
-    border-radius: 12px;
-
+  width: 140px;
+  height: 140px;
+  background: #ddd;
+  border-radius: 14px;
+  overflow: hidden; /* crop nicely */
 }
 
+.profilePicImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ========= right side content ========= */
 .profileInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    flex: 1;
+  flex: 1;
+  min-width: 0;  /*prevents weird flex overflow */
 }
+
 
 .username {
-    font-size: 20px;
-    font-weight: 700
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.2;
 }
 
 .bio {
-    color: #555;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  color: #555;
+  word-break: break-word;
 }
 
-.followBtn {
-    background: lightcoral;
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 10px;
-    font-weight: 800;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 8px;
+/* ========= cards ========= */
+.card {
+  background: transparent;
+  border: none;              
+  border-radius: 0;
+  padding: 0;                
+  margin-top: 12px;          
 }
 
-.peopleSection h2 {
-    margin: 0 0 12px 0;
+.sectionTitle {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
 }
 
-.peopleSection {
-    margin-top: 0px;
-    background: #4f9dff;
-    border: 1px solid #dbdbdb;
-    padding: 16px;
-    width: 100%;
+/* IMPORTANT: give the helper text space so it never overlaps buttons */
+.muted {
+  margin: 0 0 10px 0;
+  color: #666;
+  line-height: 1.4;
 }
 
-.peopleGrid {
-    display: flex;
-    gap: 80px;
-    margin-top: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.personCard {
-    background: white;
-    border: 1px solid #dbdbdb;
-    border-radius: 12px;
-    padding: 16px;
-    width: 200px;
-    height: 260px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.personAvatar {
-  width: 120px;
-  height: 120px;
-  background: #ddd;
-  border-radius: 12px;
-}
-
-.viewBtn {
-  padding: 6px 12px;
+/* button style */
+.primaryBtn {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 10px 14px;
   border: none;
-  background: lightcoral;
-  color: white;
-  border-radius: 6px;
-  font-weight: 600;
+  border-radius: 10px;
   cursor: pointer;
-  width: 80%;
+  font-weight: 800;
+  background: #4f9dff;
+  color: white;
+  text-decoration: none; /* so Link looks like a button */
 }
 
-.welcome {
-    padding-top: 10px;
-    font-size: 22px;
-    margin: 0 0 12px 0;
-}
-
-.personUsername {
-    font-weight: 700;
-    font-size: 18px;
-}
-
-.personName {
-    font-size: 15px;
-    color: #777;
-}
-
-.feed {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.layout {
-    max-width:1200px;
-    margin: 0 auto;
-    padding: 0 16px;
+/* ========= bottom link ========= */
+.goMsgLink {
+  display: inline-block;
+  margin-top: 18px;
+  text-decoration: none;
+  background: #4f9dff;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 800;
 }

@@ -4,6 +4,8 @@ import Messaging from "./pages/Messaging";
 import Login from "./pages/Login_SignUp";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
+import FindUsers from "./pages/FindUsers";
+import MySchedule from "./pages/MySchedule";  
 import ProtectedRoute from "./components/protectedRoute.jsx";
 
 
@@ -18,15 +20,14 @@ export default function App() {
       <Route path="/signup" element={<SignUpPage />} />
 
       {/* profile & messaging pages */}
-      <Route path="/profile" element={
-      <ProtectedRoute>
-        <Profile />
-      </ProtectedRoute>} />
-
+      <Route path="/profile" element={<Profile />} />
       <Route path="/messaging" element={<Messaging />} />
-      {/*<Route path="/find-users" element={<FindUsers />} />*/}
-    </Routes>
 
-  
+      {/* Friend page (so TopBar "Friend" tab works) */}
+      <Route path="/find-users" element={<FindUsers />} />
+
+      {/* MySchedule page (teammate's schedule page) */}
+      <Route path="/myschedule" element={<MySchedule />} />   {/* ← ADD THIS */}
+    </Routes>
   );
 }
