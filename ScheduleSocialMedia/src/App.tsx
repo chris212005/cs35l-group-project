@@ -5,28 +5,36 @@ import Login from "./pages/Login_SignUp";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import ProtectedRoute from "./components/protectedRoute.jsx";
+import { useSelector } from 'react-redux';
+import { Toaster } from 'react-hot-toast';
+import Loader from './components/loader';
+
 
 
 export default function App() {
+  const loader = useSelector((state: any) => state.loaderReducer);
   return (
-    <Routes>
-      {/* landing page */}
-      <Route path="/" element={<Login />} />
+    <div>
+      <Toaster position="top-center" reverseOrder={false} />
+      { loader && <Loader />}
+      <Routes>
+        {/* landing page */}
+        <Route path="/" element={<Login />} />
 
-      {/* new pages */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignUpPage />} />
+        {/* new pages */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
 
-      {/* profile & messaging pages */}
-      <Route path="/profile" element={
-      <ProtectedRoute>
-        <Profile />
-      </ProtectedRoute>} />
+        {/* profile & messaging pages */}
+        <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>} />
 
-      <Route path="/messaging" element={<Messaging />} />
-      {/*<Route path="/find-users" element={<FindUsers />} />*/}
-    </Routes>
-
+        <Route path="/messaging" element={<Messaging />} />
+        {/*<Route path="/find-users" element={<FindUsers />} />*/}
+      </Routes>
+    </div>
   
   );
 }

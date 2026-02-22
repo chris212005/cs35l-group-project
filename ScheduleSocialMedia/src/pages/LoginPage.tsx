@@ -2,9 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../apiCalls/auth";
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { hideLoader, showLoader } from '../redux/loaderSlice';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   const[user, setuser] = React.useState({
     email: "",
@@ -13,7 +17,10 @@ export default function LoginPage() {
 
   async function onFormSubmit() {
     try{
+      dispatch(showLoader());
       const response = await loginUser(user);
+      dispatch(hideLoader());
+
       if(response.success){
         toast.success(response.message);
         localStorage.setItem('token', response.token);
@@ -24,6 +31,7 @@ export default function LoginPage() {
       }
     }
     catch(err){
+      dispatch(hideLoader());
       toast.error(err instanceof Error ? err.message : "An unknown error occurred");
     }
   }
