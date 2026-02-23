@@ -7,7 +7,6 @@ import App from './App.tsx';
 import store from './redux/store';
 import { Provider } from 'react-redux';
 import Loader from './components/loader';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 
 createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
