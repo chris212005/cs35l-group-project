@@ -1,37 +1,64 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getLoggedUser } from "../apiCalls/users";
+import { getLoggedUser, getAllUsers } from "../apiCalls/users";
+import { useDispatch, useSelector } from "react-redux"
+import { hideLoader, showLoader } from "../redux/LoaderSlice";
+import { setAllUsers, setUser } from "../redux/usersSlice";
 
-function ProtectedRoute({children}){
-    const [user, setUser] = useState(null);
-    
+function ProtectedRoute({ children }) {
+    const { user } = useSelector(state => state.userReducer);
+    const dispatch = useDispatch();
+
     const navigate = useNavigate();
 
     const getloggedInUser = async () => {
         let response = null;
-        try{
+        try {
+            dispatch(showLoader())
             response = await getLoggedUser();
-            if(response.success){
-                setUser(response.data);
-            }else{
+            dispatch(hideLoader())
+
+            if (response.success) {
+                dispatch(setUser(response.data));
+
+            } else {
                 navigate("/login");
             }
-        }catch(error){
+        } catch (error) {
+            navigate("/login");
+        }
+    }
+
+    const getAllUsersFromDB = async () => {
+        let response = null;
+        try {
+            dispatch(showLoader())
+            response = await getAllUsers();
+            dispatch(hideLoader())
+
+            if (response.success) {
+                dispatch(setAllUsers(response.data));
+
+            } else {
+                navigate("/login");
+            }
+        } catch (error) {
             navigate("/login");
         }
     }
     useEffect(() => {
-        if(localStorage.getItem('token')){
+        if (localStorage.getItem('token')) {
             getloggedInUser();
+            getAllUsersFromDB();
         }
-        else{
+        else {
             navigate("/login");
         }
     }, []);
 
-    return(
+    return (
         <div>
-            { children }
+            {children}
         </div>
     )
 

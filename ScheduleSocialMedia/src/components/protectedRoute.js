@@ -2,49 +2,49 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLoggedUser } from './../apiCalls/users';
 import { useDispatch, useSelector } from "react-redux";
-import { hideLoader, showLoader } from "../redux/loaderSlice";
+{/*import { hideLoader, showLoader } from "../redux/loaderSlice";*/ }
 import toast from "react-hot-toast";
 import { setUser } from "../redux/userSlice";
 
-function ProtectedRoute({children}){
-    const { user } = useSelector(state => state.userReducer);
+function ProtectedRoute({ children }) {
+    {/* const { user } = useSelector(state => state.userReducer);*/ }
     const navigate = useNavigate();
 
     const dispatch = useDispatch();
 
     const getloggedInUser = async () => {
         let response = null;
-        try{
+        try {
             dispatch(showLoader());
             response = await getLoggedUser();
             dispatch(hideLoader());
             if (response.success) {
                 dispatch(setUser(response.data));
                 console.log(user);
-            }else{
+            } else {
                 toast.error(response.message);
                 navigate("/login");
             }
         }
-        catch(error){
+        catch (error) {
             dispatch(hideLoader());
             navigate("/login");
         }
     }
 
     useEffect(() => {
-        if(localStorage.getItem('token')){
+        if (localStorage.getItem('token')) {
             //write logic to get the details of the current user
             getloggedInUser();
         }
-        else{
+        else {
             navigate("/login");
         }
     }, []);
 
-    return(
+    return (
         <div>
-            { children }
+            {children}
         </div>
     );
 
