@@ -2,27 +2,52 @@ import { useState } from "react";
 
 interface Props {
   children: React.ReactNode;
-  color?: "primary" | "secondary" | "danger";
+  color?: "primary" | "secondary" | "danger" | "success" | "warning";
   onClick?: () => void;
 }
 
 const Button = ({ children, color = "primary", onClick }: Props) => {
   return (
-    <button className={"btn btn-" + color} onClick={onClick}>
+    <button
+      className={"btn btn-" + color}
+      onClick={onClick}
+      style={{ marginRight: 10 }}
+    >
       {children}
     </button>
   );
 };
 
+const classColors: { [key: string]: string } = {};
+
+const palette = [
+  "#fecaca",
+  "#bfdbfe",
+  "#bbf7d0",
+  "#fde68a",
+  "#ddd6fe",
+  "#fbcfe8",
+  "#fed7aa",
+  "#a7f3d0",
+  "#fcd34d",
+  "#c7d2fe",
+];
+
+const getColor = (title: string) => {
+  if (!classColors[title]) {
+    const index = Object.keys(classColors).length % palette.length;
+    classColors[title] = palette[index];
+  }
+  return classColors[title];
+};
+
 const MySchedule = () => {
   const [showUpload, setShowUpload] = useState(false);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
-
   const [schedule, setSchedule] = useState<{ [key: string]: string }>({});
   const [savedSchedule, setSavedSchedule] = useState<{ [key: string]: string }>(
     {},
   );
-
   const [title, setTitle] = useState("");
   const [day, setDay] = useState("Mon");
   const [start, setStart] = useState("8:00 am");
@@ -42,13 +67,30 @@ const MySchedule = () => {
     "5:00 pm",
   ];
 
+  const handleSaveChanges = () => {
+    setSavedSchedule(schedule);
+    setShowSavedMessage(true);
+  };
+
+  const handleReset = () => {
+    setSchedule({});
+    setSavedSchedule({});
+    setShowSavedMessage(false);
+
+    // reset form inputs
+    setTitle("");
+    setDay("Mon");
+    setStart("8:00 am");
+    setEnd("9:00 am");
+  };
+
   const handleAddClass = () => {
     if (!title) return;
 
-    const startIndex = times.findIndex((t) => t === start);
-    const endIndex = times.findIndex((t) => t === end);
+    const startIndex = times.findIndex((t) => t.trim() === start.trim());
+    const endIndex = times.findIndex((t) => t.trim() === end.trim());
 
-    if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) return;
+    if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) return;
 
     const updated = { ...schedule };
 
@@ -58,21 +100,6 @@ const MySchedule = () => {
 
     setSchedule(updated);
     setTitle("");
-  };
-
-  const handleReset = () => {
-    setSchedule({});
-    setSavedSchedule({});
-    setShowSavedMessage(false);
-    setTitle("");
-    setDay("Mon");
-    setStart("8:00 am");
-    setEnd("9:00 am");
-  };
-
-  const handleSaveSchedule = () => {
-    setSavedSchedule(schedule);
-    setShowSavedMessage(true);
   };
 
   return (
@@ -110,10 +137,20 @@ const MySchedule = () => {
                   >
                     <thead>
                       <tr>
-                        <th style={{ ...thStyle, width: 90 }}>Time / Day</th>
-                        {days.map((d) => (
-                          <th key={d} style={thStyle}>
-                            {d}
+                        <th
+                          style={{
+                            ...thStyle,
+                            width: 90,
+                            minWidth: 90,
+                            maxWidth: 90,
+                          }}
+                        >
+                          Time / Day
+                        </th>
+
+                        {days.map((day) => (
+                          <th key={day} style={thStyle}>
+                            {day}
                           </th>
                         ))}
                       </tr>
@@ -124,20 +161,51 @@ const MySchedule = () => {
                         <tr key={time}>
                           <td style={timeStyle}>{time}</td>
 
-                          {days.map((d) => {
-                            const key = `${d}-${time}`;
+                          {days.map((day) => {
+                            const key = `${day}-${time}`;
                             const value = savedSchedule[key];
+
+                            const i = times.indexOf(time);
+                            const prev =
+                              i > 0
+                                ? savedSchedule[`${day}-${times[i - 1]}`]
+                                : null;
+
+                            // if same as previous block → skip rendering cell
+                            if (value && value === prev) return null;
+
+                            // calculate span length
+                            let span = 1;
+                            for (let j = i + 1; j < times.length; j++) {
+                              if (schedule[`${day}-${times[j]}`] === value)
+                                span++;
+                              else break;
+                            }
 
                             return (
                               <td
                                 key={key}
+                                rowSpan={value ? span : 1}
                                 style={{
                                   ...tdStyle,
+                                  background: value ? getColor(value) : "white",
                                   textAlign: "center",
                                   fontWeight: 600,
+
+                                  borderTop:
+                                    value &&
+                                    schedule[`${day}-${times[i - 1]}`] === value
+                                      ? "none"
+                                      : "1px solid #ddd",
+
+                                  borderBottom:
+                                    value &&
+                                    schedule[`${day}-${times[i + 1]}`] === value
+                                      ? "none"
+                                      : "1px solid #ddd",
                                 }}
                               >
-                                {value || ""}
+                                {value && value !== prev ? value : ""}
                               </td>
                             );
                           })}
@@ -151,8 +219,10 @@ const MySchedule = () => {
           )}
 
           {/* EDIT PAGE */}
+          <div style={{ marginTop: 50 }}></div>
           {showUpload && (
             <div className="mt-6 border rounded-lg p-6 bg-gray-50 relative">
+              {/* Close Button */}
               <button
                 onClick={() => {
                   setShowUpload(false);
@@ -162,7 +232,7 @@ const MySchedule = () => {
                   position: "absolute",
                   top: 12,
                   right: 12,
-                  backgroundColor: "#1FA64A",
+                  background: "#1FA64A",
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
@@ -175,7 +245,7 @@ const MySchedule = () => {
               <div
                 style={{ display: "flex", gap: 30, alignItems: "flex-start" }}
               >
-                {/* LEFT: TABLE */}
+                {/* LEFT = TABLE */}
                 <div style={{ flex: 1, overflowX: "auto" }}>
                   <table
                     style={{
@@ -187,9 +257,9 @@ const MySchedule = () => {
                     <thead>
                       <tr>
                         <th style={{ ...thStyle, width: 90 }}>Time / Day</th>
-                        {days.map((d) => (
-                          <th key={d} style={thStyle}>
-                            {d}
+                        {days.map((day) => (
+                          <th key={day} style={thStyle}>
+                            {day}
                           </th>
                         ))}
                       </tr>
@@ -200,20 +270,35 @@ const MySchedule = () => {
                         <tr key={time}>
                           <td style={timeStyle}>{time}</td>
 
-                          {days.map((d) => {
-                            const key = `${d}-${time}`;
+                          {days.map((day) => {
+                            const key = `${day}-${time}`;
                             const value = schedule[key];
+
+                            const i = times.indexOf(time);
+                            const prev =
+                              i > 0 ? schedule[`${day}-${times[i - 1]}`] : null;
+
+                            if (value && value === prev) return null;
+
+                            let span = 1;
+                            for (let j = i + 1; j < times.length; j++) {
+                              if (schedule[`${day}-${times[j]}`] === value)
+                                span++;
+                              else break;
+                            }
 
                             return (
                               <td
                                 key={key}
+                                rowSpan={value ? span : 1}
                                 style={{
                                   ...tdStyle,
+                                  background: value ? getColor(value) : "white",
                                   textAlign: "center",
                                   fontWeight: 600,
                                 }}
                               >
-                                {value || ""}
+                                {value}
                               </td>
                             );
                           })}
@@ -223,8 +308,9 @@ const MySchedule = () => {
                   </table>
                 </div>
 
-                {/* RIGHT: CONTROLS */}
+                {/* RIGHT = CONTROLS */}
                 <div style={{ width: 260 }}>
+                  <div style={{ marginTop: 150 }}></div>
                   <input
                     placeholder="Class title"
                     value={title}
@@ -263,18 +349,24 @@ const MySchedule = () => {
                   </select>
 
                   <div style={{ marginBottom: 10 }}>
-                    <Button onClick={handleAddClass}>+ Add</Button>
+                    <Button onClick={handleAddClass}>+Add</Button>
                     <Button color="danger" onClick={handleReset}>
                       Reset
                     </Button>
                   </div>
 
-                  <Button color="primary" onClick={handleSaveSchedule}>
+                  <Button color="success" onClick={handleSaveChanges}>
                     Save Schedule
                   </Button>
 
                   {showSavedMessage && (
-                    <div style={{ marginTop: 10, fontWeight: 600 }}>
+                    <div
+                      style={{
+                        marginTop: 10,
+                        fontWeight: 600,
+                        color: "#1FA64A",
+                      }}
+                    >
                       ✅ Schedule saved
                     </div>
                   )}
