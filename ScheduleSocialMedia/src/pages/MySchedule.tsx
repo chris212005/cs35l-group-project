@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 interface Props {
   children: React.ReactNode;
@@ -16,75 +16,108 @@ const Button = ({ children, color = "primary", onClick }: Props) => {
 
 const MySchedule = () => {
   const [showUpload, setShowUpload] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [savedImage, setSavedImage] = useState<string | null>(null);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  // NEW: schedule data
+  const [schedule, setSchedule] = useState<{ [key: string]: string }>({});
+  const [savedSchedule, setSavedSchedule] = useState<{ [key: string]: string }>(
+    {},
+  );
 
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImagePreview(imageUrl);
-    }
-  };
+  // NEW: table axes
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const times = [
+    "8:00 am",
+    "9:00 am",
+    "10:00 am",
+    "11:00 am",
+    "12:00 pm",
+    "1:00 pm",
+    "2:00 pm",
+    "3:00 pm",
+    "4:00 pm",
+    "5:00 pm",
+  ];
 
-  const handleSaveChanges = () => {
-    if (imagePreview) {
-      setSavedImage(imagePreview);
-
-      // Show saved messages when user clicks save changes
-      setShowSavedMessage(true);
-    }
+  // TEMP: save whatever is in schedule into savedSchedule
+  // (Later we'll add Add/Reset controls to edit schedule)
+  const handleSaveSchedule = () => {
+    setSavedSchedule(schedule);
+    setShowSavedMessage(true);
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-4xl mx-auto pt-10">
         <div className="bg-white rounded-xl shadow-md p-6">
-          {/* M Header */}
+          {/* Header */}
           <div className="flex items-center gap-6">
-            {" "}
-            <div className="w-24 h-24 bg-gray-300 rounded-xl"></div>{" "}
-          </div>{" "}
-          {/* My Schedule Button */}
+            <div className="w-24 h-24 bg-gray-300 rounded-xl"></div>
+          </div>
+
+          {/* MAIN PAGE (view saved schedule) */}
           {!showUpload && (
             <div className="mt-6">
               <Button
                 color="primary"
                 onClick={() => {
                   setShowUpload(true);
-
-                  // If no change, keep the previous picture
-                  if (savedImage) {
-                    setImagePreview(savedImage);
-                  }
+                  setShowSavedMessage(false);
                 }}
               >
                 ✏️ Edit My Schedule
               </Button>
 
-              {/* Show saved image under button */}
-              {savedImage && (
-                <div className="mt-4">
-                  <img
-                    src={savedImage}
-                    alt="Saved Schedule"
-                    onClick={() => setShowPreviewModal(true)}
+              <div style={{ marginTop: 20 }}>
+                <strong>My Schedule</strong>
+
+                <div style={{ overflowX: "auto", marginTop: 10 }}>
+                  <table
                     style={{
-                      width: 200,
-                      height: 200,
-                      objectFit: "cover",
-                      borderRadius: 12,
+                      borderCollapse: "collapse",
+                      width: "100%",
+                      tableLayout: "fixed",
                     }}
-                  />
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ ...thStyle, width: 90 }}>Time / Day</th>
+                        {days.map((d) => (
+                          <th key={d} style={thStyle}>
+                            {d}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {times.map((time) => (
+                        <tr key={time}>
+                          <td style={timeStyle}>{time}</td>
+
+                          {days.map((d) => {
+                            const key = `${d}-${time}`;
+                            const value = savedSchedule[key];
+
+                            return (
+                              <td
+                                key={key}
+                                style={{ ...tdStyle, textAlign: "center" }}
+                              >
+                                {value || ""}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              )}
+              </div>
             </div>
           )}
-          {/* Upload Section */}
+
+          {/* EDIT PAGE (for now: just shows same table + save button) */}
           {showUpload && (
             <div className="mt-6 border rounded-lg p-6 bg-gray-50 relative">
               {/* Close Button */}
@@ -107,85 +140,57 @@ const MySchedule = () => {
                 X
               </button>
 
-              {/* Image Preview Box */}
-              <div className="mb-4">
-                <div
-                  onClick={() => imagePreview && setShowPreviewModal(true)}
+              <div style={{ overflowX: "auto" }}>
+                <table
                   style={{
-                    width: 160,
-                    height: 160,
-                    background: "#d1d5db",
-                    borderRadius: 20,
-                    overflow: "hidden",
-                    position: "relative",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    borderCollapse: "collapse",
+                    width: "100%",
+                    tableLayout: "fixed",
                   }}
                 >
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    <span style={{ color: "#6b7280", fontSize: 14 }}>
-                      Upload your photo
-                    </span>
-                  )}
-                </div>
+                  <thead>
+                    <tr>
+                      <th style={{ ...thStyle, width: 90 }}>Time / Day</th>
+                      {days.map((d) => (
+                        <th key={d} style={thStyle}>
+                          {d}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {times.map((time) => (
+                      <tr key={time}>
+                        <td style={timeStyle}>{time}</td>
+
+                        {days.map((d) => {
+                          const key = `${d}-${time}`;
+                          const value = schedule[key]; // NOTE: editing uses schedule (not savedSchedule)
+
+                          return (
+                            <td
+                              key={key}
+                              style={{ ...tdStyle, textAlign: "center" }}
+                            >
+                              {value || ""}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
-              {/* File + Reset Column */}
-              <div className="flex flex-col items-start gap-2">
-                <div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                  />
-                </div>
+              <div style={{ marginTop: 12 }}>
+                <Button color="primary" onClick={handleSaveSchedule}>
+                  Save Schedule
+                </Button>
 
-                {/*Save Changes and Delete button*/}
-                {imagePreview && (
-                  <div>
-                    <Button color="primary" onClick={() => handleSaveChanges()}>
-                      Save Changes
-                    </Button>
-
-                    <Button
-                      color="danger"
-                      onClick={() => {
-                        setImagePreview(null);
-                        setSavedImage(null);
-                        setShowSavedMessage(false);
-
-                        if (fileInputRef.current) {
-                          fileInputRef.current.value = "";
-                        }
-                      }}
-                    >
-                      Delete Picture
-                    </Button>
-
-                    {showSavedMessage && (
-                      <div
-                        style={{
-                          marginTop: 10,
-                          fontWeight: 600,
-                          fontSize: 14,
-                        }}
-                      >
-                        ✅ The image has been saved
-                      </div>
-                    )}
+                {showSavedMessage && (
+                  <div style={{ marginTop: 10, fontWeight: 600, fontSize: 14 }}>
+                    ✅ Schedule saved
                   </div>
                 )}
               </div>
@@ -193,33 +198,38 @@ const MySchedule = () => {
           )}
         </div>
       </div>
-      {/* Image Modal Viewer -> Show full screen onClick */}
-      {showPreviewModal && (imagePreview || savedImage) && (
-        <div
-          onClick={() => setShowPreviewModal(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 999,
-          }}
-        >
-          <img
-            src={imagePreview || savedImage || ""}
-            alt="Full Preview"
-            style={{
-              maxWidth: "80%",
-              maxHeight: "80%",
-              borderRadius: 12,
-              boxShadow: "0 10px 40px rgba(0,0,0,0.4)",
-            }}
-          />
-        </div>
-      )}
     </div>
   );
 };
+
+/* ---------- styles ---------- */
+
+const thStyle = {
+  border: "1px solid #ddd",
+  padding: 8,
+  background: "#f3f4f6",
+  textAlign: "center" as const,
+  verticalAlign: "middle" as const,
+  fontWeight: 700,
+  height: 50,
+};
+
+const tdStyle = {
+  border: "1px solid #ddd",
+  padding: 4,
+  height: 48,
+};
+
+const timeStyle = {
+  border: "1px solid #ddd",
+  padding: "6px 4px",
+  fontWeight: 600,
+  background: "#f9fafb",
+  width: 90,
+  minWidth: 90,
+  maxWidth: 90,
+  textAlign: "center" as const,
+  verticalAlign: "middle" as const,
+};
+
 export default MySchedule;
