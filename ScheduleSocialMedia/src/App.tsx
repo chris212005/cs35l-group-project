@@ -1,33 +1,76 @@
 import { Routes, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Toaster } from "react-hot-toast";
+
 import Profile from "./pages/Profile";
 import Messaging from "./pages/Messaging";
 import Login from "./pages/Login_SignUp";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import FindUsers from "./pages/FindUsers";
-import MySchedule from "./pages/MySchedule";  
-import ProtectedRoute from "./components/protectedRoute.jsx";
+import MySchedule from "./pages/MySchedule";
 
+import ProtectedRoute from "./components/protectedRoute.jsx";
+import Loader from "./components/loader";
 
 export default function App() {
+  const loader = useSelector((state: any) => state.loaderReducer);
+
   return (
-    <Routes>
-      {/* landing page */}
-      <Route path="/" element={<Login />} />
+    <div>
+      <Toaster position="top-center" reverseOrder={false} />
+      {loader && <Loader />}
 
-      {/* new pages */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignUpPage />} />
+      <Routes>
+        {/* Landing page */}
+        <Route path="/" element={<Login />} />
 
-      {/* profile & messaging pages */}
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/messaging" element={<Messaging />} />
+        {/* Auth pages */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
 
-      {/* Friend page (so TopBar "Friend" tab works) */}
-      <Route path="/find-users" element={<FindUsers />} />
+        {/* ================= PROTECTED PAGES ================= */}
 
-      {/* MySchedule page (teammate's schedule page) */}
-      <Route path="/myschedule" element={<MySchedule />} />   {/* ← ADD THIS */}
-    </Routes>
+        {/* Profile page */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Messaging page */}
+        <Route
+          path="/messaging"
+          element={
+            <ProtectedRoute>
+              <Messaging />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Friend page (TopBar "Friend" tab works) */}
+        <Route
+          path="/find-users"
+          element={
+            <ProtectedRoute>
+              <FindUsers />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* MySchedule page */}
+        <Route
+          path="/myschedule"
+          element={
+            <ProtectedRoute>
+              <MySchedule />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </div>
   );
 }

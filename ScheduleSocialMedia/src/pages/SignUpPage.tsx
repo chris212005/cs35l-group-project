@@ -2,9 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { signupUser } from "../apiCalls/auth";
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { hideLoader, showLoader } from '../redux/loaderSlice';
 
 export default function SignUpPage() {
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   const [user, setUser] = React.useState({
     firstname: "",
@@ -15,12 +19,15 @@ export default function SignUpPage() {
 
   async function onFormSubmit() {
     try{
+      dispatch(showLoader());
       const response = await signupUser(user);
+      dispatch(hideLoader());
       if(response.success){
         toast.success(response.message);
         navigate("/profile")
       }
       else{
+        dispatch(hideLoader());
         toast.error(response.message);
       }
     }
