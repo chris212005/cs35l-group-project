@@ -1,38 +1,38 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../apiCalls/auth";
-import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
-import { hideLoader, showLoader } from '../redux/loaderSlice';
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../redux/loaderSlice";
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  const[user, setuser] = React.useState({
+  const [user, setuser] = React.useState({
     email: "",
     password: "",
   });
 
   async function onFormSubmit() {
-    try{
+    try {
       dispatch(showLoader());
       const response = await loginUser(user);
       dispatch(hideLoader());
 
-      if(response.success){
+      if (response.success) {
         toast.success(response.message);
-        localStorage.setItem('token', response.token);
-        navigate("/profile")
-      }
-      else{
+        localStorage.setItem("token", response.token);
+        navigate("/profile");
+      } else {
         toast.error(response.message);
       }
-    }
-    catch(err){
+    } catch (err) {
       dispatch(hideLoader());
-      toast.error(err instanceof Error ? err.message : "An unknown error occurred");
+      toast.error(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
     }
   }
 
@@ -83,47 +83,48 @@ export default function LoginPage() {
           Enter your UCLA email to continue
         </p>
 
-        <form 
+        <form
           onSubmit={(e) => {
             e.preventDefault();
-            onFormSubmit();}}
-        >
-        <input type="email" 
-        placeholder="UCLA Email" 
-        style={inputStyle} 
-        value = {user.email}
-        onChange={ (e) => setuser({...user, email: e.target.value})}
-        />
-
-        <br />
-
-        <input type="password" 
-        placeholder="Password" 
-        style={inputStyle} 
-        value = {user.password}
-        onChange={ (e) => setuser({...user, password: e.target.value})}
-        />
-        
-        <br />
-
-        <button style={buttonStyle}>
-          Log In
-        </button>
-        
-        <br />
-
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            marginTop: "15px",
-            background: "none",
-            border: "none",
-            color: "#2563eb",
-            cursor: "pointer",
+            onFormSubmit();
           }}
         >
-          ← Back
-        </button>
+          <input
+            type="email"
+            placeholder="UCLA Email"
+            style={inputStyle}
+            value={user.email}
+            onChange={(e) => setuser({ ...user, email: e.target.value })}
+          />
+
+          <br />
+
+          <input
+            type="password"
+            placeholder="Password"
+            style={inputStyle}
+            value={user.password}
+            onChange={(e) => setuser({ ...user, password: e.target.value })}
+          />
+
+          <br />
+
+          <button style={buttonStyle}>Log In</button>
+
+          <br />
+
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              marginTop: "15px",
+              background: "none",
+              border: "none",
+              color: "#2563eb",
+              cursor: "pointer",
+            }}
+          >
+            ← Back
+          </button>
         </form>
       </div>
     </div>

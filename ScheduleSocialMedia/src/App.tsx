@@ -35,7 +35,14 @@ export default function App() {
         />
 
         <Route path="/messaging" element={<Messaging />} />
-        <Route path="/find-users" element={<FindUsers />} />
+        <Route
+          path="/find-users"
+          element={
+            <ProtectedRoute>
+              <FindUsers />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

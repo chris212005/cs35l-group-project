@@ -1,6 +1,10 @@
 import "./search.css";
+type SearchProps = {
+  searchKey: string;
+  setSearchKey: React.Dispatch<React.SetStateAction<string>>;
+};
 
-export default function Search({ searchKey, setSearchKey }: any) {
+export default function Search({ searchKey, setSearchKey }: SearchProps) {
   return (
     <div className="user-search-area">
       <input

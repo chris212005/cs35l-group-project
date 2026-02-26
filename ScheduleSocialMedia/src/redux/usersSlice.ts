@@ -5,12 +5,12 @@ const usersSlice = createSlice({
     initialState: { 
         user: null, 
         allUsers: [],
-        allCharts: [] 
+        allChats: [] 
     },
     reducers: {
         setUser: (state, action) => { state.user = action.payload; },
         setAllUsers: (state, action) => { state.allUsers = action. payload; },
-        setAllChats: (state, action) => { state.allCharts = action.payload; }
+        setAllChats: (state, action) => { state.allChats = action.payload; }
     }
 });
 

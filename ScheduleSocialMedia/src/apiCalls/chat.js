@@ -9,3 +9,12 @@ export const getAllChats = async () => {
   }
 }
 
+export const createNewChat = async ( members ) => {
+  try {
+    const response = await axios.post('/api/chat/create-new-chat', { members })
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+}
+
