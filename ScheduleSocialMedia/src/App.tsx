@@ -11,11 +11,11 @@ import Loader from "./components/loader";
 import FindUsers from "./pages/FindUsers";
 
 export default function App() {
-  const loader = useSelector((state: any) => state.loaderReducer);
+  const loading = useSelector((state: any) => state.loaderReducer.loading);
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false} />
-      {loader && <Loader />}
+      {loading && <Loader />}
       <Routes>
         {/* landing page */}
         <Route path="/" element={<Login />} />

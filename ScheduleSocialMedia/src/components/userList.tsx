@@ -16,6 +16,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
   } = useSelector((state: any) => state.userReducer);
   const dispatch = useDispatch();
   const startNewChat = async (searchedUserId: string) => {
+    console.log("BUTTON CLICKED");
     let response = null;
     try {
       dispatch(showLoader());
@@ -42,7 +43,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
         allChats.some((chat: any) => chat.members.includes(user._id))
     )
     .map((user: any) => (
-      <div className="user-search-filter">
+      <div key={user._id} className="user-search-filter">
         <div className="filtered-user">
           <div className="filter-user-display">
             {user.profilePic && (
@@ -65,7 +66,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
               <div className="user-display-email">{user.email}</div>
             </div>
             {!allChats?.find((chat: any) =>
-              chat.members.inlcudes(user._id)
+              chat.members.includes(user._id)
             ) && (
               <div className="user-start-chat">
                 <button
