@@ -1,0 +1,43 @@
+.topbar {
+    width: 100%;
+    background: #4f8fe9;
+    padding: 14px 18px;
+  }
+  
+  .topbarInner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .brand {
+    color: white;
+    font-weight: 800;
+    font-size: 20px;
+  }
+  
+  .topbarNav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  /* make Links look like buttons */
+  .topbarBtn {
+    background: #ffffff;
+    color: #111;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .topbarBtn:hover {
+    filter: brightness(0.98);
+  }

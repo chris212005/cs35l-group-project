@@ -1,39 +1,24 @@
-// TopBar.tsx
-// CHANGES:
-// - Brand text changed to "BruinCord"
-// - Added nav tabs: Messaging + Friend (matches teammate sketch)
-// - Removed search + icon circles (you said delete add/follow + the extra stuff)
-
-import { Link, useLocation } from "react-router-dom";
-import "../pages/Profile.css"; // reusing your existing CSS file for styling
+import { Link } from "react-router-dom";
+import "./TopBar.css";
 
 export default function TopBar() {
-  const location = useLocation();
-
-  // helper to highlight active tab
-  const isActive = (path: string) => location.pathname === path;
-
   return (
-    <div className="topbar">
-      {/*  name */}
-      <div className="logo">BruinCord</div>
+    <header className="topbar">
+      <div className="topbarInner">
+        <div className="brand">BruinCord</div>
 
-      {/* tab nav  */}
-      <div className="topTabs">
-        <Link to="/messaging" className={`topTab ${isActive("/messaging") ? "activeTab" : ""}`}>
-          Messaging
-        </Link>
-
-        {/* "Friend" tab -> use /find-users if that's your friend page */}
-        <Link to="/find-users" className={`topTab ${isActive("/find-users") ? "activeTab" : ""}`}>
-          Friends
-        </Link>
-
-        {/* tabs  */}
-        <button className="topTab moreTab" type="button" aria-label="More">
-          …
-        </button>
+        <nav className="topbarNav">
+          <Link className="topbarBtn" to="/messaging">
+            Messaging
+          </Link>
+          <Link className="topbarBtn" to="/find-users">
+            Friends
+          </Link>
+          <button className="topbarBtn" type="button" aria-label="More">
+            …
+          </button>
+        </nav>
       </div>
-    </div>
+    </header>
   );
 }
