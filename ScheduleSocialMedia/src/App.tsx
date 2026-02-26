@@ -10,7 +10,6 @@ import SignUpPage from "./pages/SignUpPage";
 import FindUsers from "./pages/FindUsers";
 import MySchedule from "./pages/MySchedule";
 
-import ProtectedRoute from "./components/protectedRoute.jsx";
 import Loader from "./components/loader";
 
 export default function App() {
@@ -29,47 +28,11 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
 
-        {/* ================= PROTECTED PAGES ================= */}
-
-        {/* Profile page */}
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Messaging page */}
-        <Route
-          path="/messaging"
-          element={
-            <ProtectedRoute>
-              <Messaging />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Friend page (TopBar "Friend" tab works) */}
-        <Route
-          path="/find-users"
-          element={
-            <ProtectedRoute>
-              <FindUsers />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* MySchedule page */}
-        <Route
-          path="/myschedule"
-          element={
-            <ProtectedRoute>
-              <MySchedule />
-            </ProtectedRoute>
-          }
-        />
+        {/* TESTING: No ProtectedRoute for now */}
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/messaging" element={<Messaging />} />
+        <Route path="/find-users" element={<FindUsers />} />
+        <Route path="/myschedule" element={<MySchedule />} />
       </Routes>
     </div>
   );

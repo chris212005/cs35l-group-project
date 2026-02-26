@@ -9,6 +9,7 @@
   max-width: 980px;
   margin: 0 auto;
   padding: 90px 18px 28px;
+  min-height: calc(100vh - 90px);
 }
 
 /* title */
@@ -120,4 +121,8 @@
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   background: #fafafa;
+}
+
+.app {
+  overflow: visible;
 }
