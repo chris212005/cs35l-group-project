@@ -11,6 +11,7 @@ import FindUsers from "./pages/FindUsers";
 import MySchedule from "./pages/MySchedule";
 
 import Loader from "./components/loader";
+import ProtectedRoute from "./components/protectedRoute";
 
 export default function App() {
   const loader = useSelector((state: any) => state.loaderReducer);
@@ -31,7 +32,10 @@ export default function App() {
         {/* TESTING: No ProtectedRoute for now */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/messaging" element={<Messaging />} />
-        <Route path="/find-users" element={<FindUsers />} />
+        <Route path="/find-users" element={
+          <ProtectedRoute>
+            <FindUsers />
+          </ProtectedRoute>} />
         <Route path="/myschedule" element={<MySchedule />} />
       </Routes>
     </div>
