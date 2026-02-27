@@ -1,177 +1,128 @@
+/* page background */
 .app {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: #fafafa;
   min-height: 100vh;
-  padding-bottom: 40px;
+  background: #f3f4f6;
 }
 
-.topbar {
-  height: 60px;
-  background: #4f9dff;
-  border-bottom: 1px solid #dbdbdb;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  position: sticky;
-  top: 0;
+/* main content container */
+.layout {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 90px 18px 28px;
+  min-height: calc(100vh - 90px);
 }
 
-.logo {
+/* title */
+.pageTitle {
+  margin: 6px 0 18px;
+  font-size: 40px;
   font-weight: 800;
-  letter-spacing: 0.2px;
+  color: #111;
 }
 
-.search {
-  width: 320px;
-  max-width: 40vw;
-  padding: 10px 12px;
-  border: 1px solid #dbdbdb;
-  border-radius: 10px;
-  background: #efefef;
-  outline: none;
-}
-
-.icons {
+/* top section: pic + right panel */
+.profileHeader {
   display: flex;
-  gap: 10px;
+  gap: 22px;
+  align-items: flex-start;
 }
 
-.iconCircle {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 1px solid #dbdbdb;
-  background: #f6f6f6;
-}
-
-.content {
-  padding: 24px 16px;
-}
-
-.profileCardLarge {
-    display: flex;
-    gap: 45px;
-    align-items: flex-start;
-    background: white;
-    border: 0px solid #dbdbdb;
-    border-radius: 12px;
-    padding: 25px;
-    height: 250px;
-}
-
+/* profile picture box */
 .profilePicLarge {
-    width: 120px;
-    height: 120px;
-    background: #ddd;
-    border-radius: 12px;
-
+  width: 140px;
+  height: 140px;
+  background: #ddd;
+  border-radius: 16px;
+  overflow: hidden;          /*  crops image into the square */
+  flex: 0 0 140px;
+  display: flex;             /* centers placeholder text if you add it */
+  align-items: center;
+  justify-content: center;
 }
 
+
+.profilePicImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;         /*  fills box without stretching */
+  display: block;
+}
+
+/* right side */
 .profileInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    flex: 1;
+  flex: 1;
+  min-width: 0; /* prevents weird overflow */
 }
 
 .username {
-    font-size: 20px;
-    font-weight: 700
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.2;
 }
 
 .bio {
-    color: #555;
+  margin-top: 6px;
+  margin-bottom: 14px;
+  color: #555;
+  word-break: break-word;
 }
 
-.followBtn {
-    background: lightcoral;
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 10px;
-    font-weight: 800;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 8px;
+/* cards */
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-top: 14px;
 }
 
-.peopleSection h2 {
-    margin: 0 0 12px 0;
+.sectionTitle {
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: #111;
 }
 
-.peopleSection {
-    margin-top: 0px;
-    background: #4f9dff;
-    border: 1px solid #dbdbdb;
-    padding: 16px;
-    width: 100%;
+.muted {
+  color: #6b7280;
+  margin: 0 0 12px;
 }
 
-.peopleGrid {
-    display: flex;
-    gap: 80px;
-    margin-top: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.personCard {
-    background: white;
-    border: 1px solid #dbdbdb;
-    border-radius: 12px;
-    padding: 16px;
-    width: 200px;
-    height: 260px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.personAvatar {
-  width: 120px;
-  height: 120px;
-  background: #ddd;
-  border-radius: 12px;
-}
-
-.viewBtn {
-  padding: 6px 12px;
-  border: none;
-  background: lightcoral;
+/* buttons */
+.primaryBtn {
+  background: #4f9dff;
   color: white;
-  border-radius: 6px;
-  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
   cursor: pointer;
-  width: 80%;
 }
 
-.welcome {
-    padding-top: 10px;
-    font-size: 22px;
-    margin: 0 0 12px 0;
+.primaryBtn:hover {
+  filter: brightness(0.98);
 }
 
-.personUsername {
-    font-weight: 700;
-    font-size: 18px;
+/* schedule placeholder card */
+.scheduleCard {
+  margin-top: 16px;
 }
 
-.personName {
-    font-size: 15px;
-    color: #777;
+.scheduleGrid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
 }
 
-.feed {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.scheduleCell {
+  height: 54px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fafafa;
 }
 
-.layout {
-    max-width:1200px;
-    margin: 0 auto;
-    padding: 0 16px;
+.app {
+  overflow: visible;
 }
