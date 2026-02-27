@@ -112,7 +112,7 @@ export default function MySchedule({ embedded = false }: Props) {
 
   const handleSaveChanges = () => {
     setSavedEvents(events);
-    localStorage.setItem("savedEvents", JSON.stringify(events));
+    localStorage.setItem("savedEvents", JSON.stringify(events));  
     setShowSavedMessage(true);
   };
 
