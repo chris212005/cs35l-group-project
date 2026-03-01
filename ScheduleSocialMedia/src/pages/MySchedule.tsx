@@ -92,7 +92,7 @@ const safeUUID = () => {
 };
 
 export default function MySchedule({ embedded = false }: Props) {
-  const [showUpload, setShowUpload] = useState(true);
+  const [showUpload, _setShowUpload] = useState(true);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
 
   // store real events (not per-cell)
