@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   /** If true, renders ONLY the schedule grid (no full-page wrappers / edit UI) */
@@ -91,12 +92,14 @@ const safeUUID = () => {
 };
 
 export default function MySchedule({ embedded = false }: Props) {
-  const [showUpload, setShowUpload] = useState(false);
+  const [showUpload, setShowUpload] = useState(true);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
 
   // store real events (not per-cell)
   const [events, setEvents] = useState<EventItem[]>([]);
   const [savedEvents, setSavedEvents] = useState<EventItem[]>([]);
+
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [selectedDays, setSelectedDays] = useState<Day[]>(["Mon"]);
@@ -107,12 +110,12 @@ export default function MySchedule({ embedded = false }: Props) {
 
   const hourStarts = Array.from(
     { length: END_HOUR - START_HOUR + 1 },
-    (_, i) => START_HOUR + i
+    (_, i) => START_HOUR + i,
   );
 
   const handleSaveChanges = () => {
     setSavedEvents(events);
-    localStorage.setItem("savedEvents", JSON.stringify(events));  
+    localStorage.setItem("savedEvents", JSON.stringify(events));
     setShowSavedMessage(true);
   };
 
@@ -141,7 +144,7 @@ export default function MySchedule({ embedded = false }: Props) {
 
   const toggleDay = (d: Day) => {
     setSelectedDays((prev) =>
-      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
+      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d],
     );
   };
 
@@ -198,7 +201,7 @@ export default function MySchedule({ embedded = false }: Props) {
     };
 
     const colMin = compact ? 110 : 140; // ✅ tighter columns on profile so Sun fits
-const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
+    const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
 
     return (
       <div style={{ width: "100%" }}>
@@ -248,14 +251,14 @@ const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
           <div style={{ width: 90, minWidth: 90 }}>
             {hourStarts.map((h) => (
               <div
-              key={h}
-              style={{
-                ...timeRowStyle,
-                height: rowHeight,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
+                key={h}
+                style={{
+                  ...timeRowStyle,
+                  height: rowHeight,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
                 {formatHourLabel(h)}
               </div>
             ))}
@@ -319,7 +322,7 @@ const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
                             gap: 6,
                           }}
                           title={`${ev.title} ${formatTime12(
-                            ev.start
+                            ev.start,
                           )} – ${formatTime12(ev.end)}`}
                         >
                           <div
@@ -374,35 +377,13 @@ const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-4xl mx-auto pt-10">
         <div className="bg-white rounded-xl shadow-md p-6">
-          {!showUpload && (
-            <div className="mt-6">
-              <Button
-                color="primary"
-                onClick={() => {
-                  setShowUpload(true);
-                  setShowSavedMessage(false);
-                }}
-              >
-                ✏️ Edit My Schedule
-              </Button>
-
-              <div style={{ marginTop: 20 }}>
-                <strong>My Schedule</strong>
-                <div style={{ marginTop: 10 }}>
-                  <ScheduleGrid data={savedEvents} />
-                </div>
-              </div>
-            </div>
-          )}
-
           <div style={{ marginTop: 50 }} />
 
           {showUpload && (
             <div className="mt-6 border rounded-lg p-6 bg-gray-50 relative">
               <button
                 onClick={() => {
-                  setShowUpload(false);
-                  setShowSavedMessage(false);
+                  navigate("/profile");
                 }}
                 style={{
                   position: "absolute",
@@ -538,7 +519,7 @@ const thStyle = {
   verticalAlign: "middle" as const,
   fontWeight: 800,
   color: "#111827",
-  boxSizing: "border-box" as const, 
+  boxSizing: "border-box" as const,
 };
 
 const timeRowStyle = {
@@ -549,5 +530,5 @@ const timeRowStyle = {
   fontWeight: 800,
   background: "#f9fafb",
   color: "#111827",
-  boxSizing: "border-box" as const, 
+  boxSizing: "border-box" as const,
 };
