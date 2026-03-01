@@ -17,7 +17,19 @@ export const saveSchedule = async (schedule) => {
 export const getMySchedule = async () => {
   try {
     const response = await axiosInstance.get(
-      "/api/schedule/get-my-schedule"
+      "/api/schedule/get-user-schedule"
+    );
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+// Delete Schedule
+export const deleteSchedule = async () => {
+  try {
+    const response = await axiosInstance.delete(
+      "/api/schedule/delete-schedule"
     );
     return response.data;
   } catch (error) {

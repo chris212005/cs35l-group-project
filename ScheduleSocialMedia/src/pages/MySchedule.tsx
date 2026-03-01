@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+// @ts-ignore
+import { saveSchedule, getMySchedule } from "../apiCalls/schedule";
 
 type Props = {
   /** If true, renders ONLY the schedule grid (no full-page wrappers / edit UI) */
@@ -113,26 +115,39 @@ export default function MySchedule({ embedded = false }: Props) {
     (_, i) => START_HOUR + i,
   );
 
-  const handleSaveChanges = () => {
-    setSavedEvents(events);
-    localStorage.setItem("savedEvents", JSON.stringify(events));
-    setShowSavedMessage(true);
+  const handleSaveChanges = async () => {
+    console.log("Saving events:", events);
+
+    try {
+      const response = await saveSchedule(events);
+      console.log("Server response:", response);
+
+      if (response.success) {
+        setSavedEvents(events);
+        setShowSavedMessage(true);
+      } else {
+        console.log("Error:", response.message);
+      }
+    } catch (error) {
+      console.error("Save failed:", error);
+    }
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem("savedEvents");
-    if (stored) {
+    const fetchSchedule = async () => {
       try {
-        const parsed = JSON.parse(stored) as EventItem[];
-        if (Array.isArray(parsed)) {
-          setSavedEvents(parsed);
-          setEvents(parsed); //load saved events into main state on mount
+        const response = await getMySchedule();
+
+        if (response.success && response.data) {
+          setEvents(response.data.schedule);
+          setSavedEvents(response.data.schedule);
         }
-      } catch {
-        setSavedEvents([]);
-        setEvents([]);
+      } catch (error) {
+        console.log(error);
       }
-    }
+    };
+
+    fetchSchedule();
   }, []);
 
   const handleReset = () => {
