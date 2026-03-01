@@ -28,7 +28,7 @@ const formatTime12 = (hhmm: string) => {
   const ampm = h >= 12 ? "PM" : "AM";
   const h12 = ((h + 11) % 12) + 1;
   const mm = String(m).padStart(2, "0");
-  return `${h12}:${mm} ${ampm}`;
+  return `${h12}:${mm}${ampm}`;
 };
 
 interface ButtonProps {
@@ -124,9 +124,13 @@ export default function MySchedule({ embedded = false }: Props) {
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as EventItem[];
-        setSavedEvents(Array.isArray(parsed) ? parsed : []);
+        if (Array.isArray(parsed)) {
+          setSavedEvents(parsed);
+          setEvents(parsed); //load saved events into main state on mount
+        }
       } catch {
         setSavedEvents([]);
+        setEvents([]);
       }
     }
   }, []);
@@ -192,26 +196,26 @@ export default function MySchedule({ embedded = false }: Props) {
       const dayStart = hourStarts[0] * 60;
 
       const topMinutes = s - dayStart;
-      const durationMinutes = Math.max(12, e - s);
+      const durationMinutes = Math.max(40, e - s + 60);
 
       return {
         top: Math.round(topMinutes * pxPerMinute),
-        height: Math.round(durationMinutes * pxPerMinute),
+        height: Math.round(durationMinutes * pxPerMinute) + 1,
       };
     };
 
-    const colMin = compact ? 110 : 140; // ✅ tighter columns on profile so Sun fits
+    const colMin = compact ? 130 : 160; // ✅ tighter columns on profile so Sun fits
     const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
 
     return (
-      <div style={{ width: "100%" }}>
+      <div style={{ width: "100%", overflowX: "auto" }}>
         {/* header row (Time + days headers) */}
         <div style={{ display: "flex", gap: 12 }}>
           <div style={{ width: 90, minWidth: 90 }}>
             <div style={{ ...thStyle, height: 46 }}>Time</div>
           </div>
 
-          <div style={{ flex: 1, overflowX: "auto" }}>
+          <div style={{ flex: 1 }}>
             <div
               style={{
                 display: "grid",
@@ -265,7 +269,7 @@ export default function MySchedule({ embedded = false }: Props) {
           </div>
 
           {/* days area (NO vertical scroll here) */}
-          <div style={{ flex: 1, overflowX: "auto" }}>
+          <div style={{ flex: 1 }}>
             <div
               style={{
                 display: "grid",
@@ -316,7 +320,7 @@ export default function MySchedule({ embedded = false }: Props) {
                             padding: compact ? "8px 10px" : "10px 12px",
                             lineHeight: 1.15,
                             boxShadow: "0 2px 6px rgba(0,0,0,0.10)",
-                            overflow: "hidden",
+                            overflow: "visible",
                             display: "flex",
                             flexDirection: "column",
                             gap: 6,
@@ -329,9 +333,8 @@ export default function MySchedule({ embedded = false }: Props) {
                             style={{
                               fontSize: compact ? 13 : 14,
                               fontWeight: 900,
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
+                              whiteSpace: "normal",
+                              wordBreak: "break-word",
                             }}
                           >
                             {ev.title}
@@ -343,11 +346,10 @@ export default function MySchedule({ embedded = false }: Props) {
                               fontWeight: 800,
                               opacity: 0.95,
                               whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
+                              textOverflow: "break-word",
                             }}
                           >
-                            {formatTime12(ev.start)} – {formatTime12(ev.end)}
+                            {formatTime12(ev.start)}–{formatTime12(ev.end)}
                           </div>
                         </div>
                       );
