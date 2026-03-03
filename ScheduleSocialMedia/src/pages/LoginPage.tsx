@@ -4,11 +4,19 @@ import { loginUser } from "../apiCalls/auth";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../redux/loaderSlice";
+import bruinCordLogo from "../assets/BruinCordLogo.png";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
+
+  const styles = `
+    @keyframes floatLogo {
+      0% { transform: translate(-50%, 0px); }
+      50% { transform: translate(-50%, -6px); }
+      100% { transform: translate(-50%, 0px); }
+    }
+  `;
 
   const [user, setuser] = React.useState({
     email: "",
@@ -61,6 +69,7 @@ export default function LoginPage() {
   return (
     <div
       style={{
+        position: "relative",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -68,6 +77,25 @@ export default function LoginPage() {
         backgroundColor: "#4f9dff",
       }}
     >
+      <style>{styles}</style>
+
+      {/* LOGO (absolute so it DOES NOT move the card) */}
+      <img
+        src={bruinCordLogo}
+        alt="BruinCord Logo"
+        style={{
+          position: "absolute",
+          top: "70px", // tweak this up/down without affecting the card
+          left: "50%",
+          width: "560px",
+          animation: "floatLogo 3.5s ease-in-out infinite",
+          filter: "drop-shadow(0 14px 25px rgba(0,0,0,0.25))",
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* WHITE CARD (keeps original centered position) */}
       <div
         style={{
           backgroundColor: "white",
@@ -75,6 +103,8 @@ export default function LoginPage() {
           borderRadius: "12px",
           boxShadow: "0 8px 20px rgba(0,0,0,0.18)",
           textAlign: "center",
+          width: "420px",
+          zIndex: 1,
         }}
       >
         <h1 style={{ marginBottom: "5px", color: "#111827" }}>Login</h1>
