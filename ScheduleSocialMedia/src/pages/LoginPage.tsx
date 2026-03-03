@@ -81,19 +81,20 @@ export default function LoginPage() {
 
       {/* LOGO (absolute so it DOES NOT move the card) */}
       <img
-        src={bruinCordLogo}
-        alt="BruinCord Logo"
-        style={{
-          position: "absolute",
-          top: "70px", // tweak this up/down without affecting the card
-          left: "50%",
-          width: "560px",
-          animation: "floatLogo 3.5s ease-in-out infinite",
-          filter: "drop-shadow(0 14px 25px rgba(0,0,0,0.25))",
-          zIndex: 2,
-          pointerEvents: "none",
-        }}
-      />
+  src={bruinCordLogo}
+  alt="BruinCord Logo"
+  style={{
+    position: "absolute",
+    top: "20px",         // moved higher
+    left: "50%",
+    width: "520px",      // slightly smaller
+    maxWidth: "90%",     // prevents overlap
+    animation: "floatLogo 3.5s ease-in-out infinite",
+    filter: "drop-shadow(0 14px 25px rgba(0,0,0,0.25))",
+    zIndex: 2,
+    pointerEvents: "none",
+  }}
+/>
 
       {/* WHITE CARD (keeps original centered position) */}
       <div

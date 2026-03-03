@@ -90,17 +90,22 @@ export default function SignUpPage() {
       <style>{styles}</style>
 
       {/* Logo */}
-      <img
-        src={bruinCordLogo}
-        alt="BruinCord Logo"
-        style={{
-          position: "absolute",
-          top: "40px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "520px",
-        }}
-      />
+      {/* Logo (absolute so it DOES NOT move the card) */}
+<img
+  src={bruinCordLogo}
+  alt="BruinCord Logo"
+  style={{
+    position: "absolute",
+    top: "1px",          // move logo up/down without touching the card
+    left: "50%",
+    width: "520px",
+    maxWidth: "90%",      // prevents overlap on smaller screens
+    transform: "translateX(-50%)",
+    zIndex: 2,
+    pointerEvents: "none",
+    filter: "drop-shadow(0 14px 25px rgba(0,0,0,0.25))",
+  }}
+/>
 
       {/* White Card */}
       <div
