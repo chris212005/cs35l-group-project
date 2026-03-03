@@ -1,4 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
+// @ts-ignore
+import { saveSchedule, getMySchedule } from "../apiCalls/schedule";
 
 type Props = {
   /** If true, renders ONLY the schedule grid (no full-page wrappers / edit UI) */
@@ -27,7 +30,7 @@ const formatTime12 = (hhmm: string) => {
   const ampm = h >= 12 ? "PM" : "AM";
   const h12 = ((h + 11) % 12) + 1;
   const mm = String(m).padStart(2, "0");
-  return `${h12}:${mm} ${ampm}`;
+  return `${h12}:${mm}${ampm}`;
 };
 
 interface ButtonProps {
@@ -91,12 +94,14 @@ const safeUUID = () => {
 };
 
 export default function MySchedule({ embedded = false }: Props) {
-  const [showUpload, setShowUpload] = useState(false);
+  const [showUpload, _setShowUpload] = useState(true);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
 
   // store real events (not per-cell)
   const [events, setEvents] = useState<EventItem[]>([]);
   const [savedEvents, setSavedEvents] = useState<EventItem[]>([]);
+
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [selectedDays, setSelectedDays] = useState<Day[]>(["Mon"]);
@@ -107,25 +112,42 @@ export default function MySchedule({ embedded = false }: Props) {
 
   const hourStarts = Array.from(
     { length: END_HOUR - START_HOUR + 1 },
-    (_, i) => START_HOUR + i
+    (_, i) => START_HOUR + i,
   );
 
-  const handleSaveChanges = () => {
-    setSavedEvents(events);
-    localStorage.setItem("savedEvents", JSON.stringify(events));  
-    setShowSavedMessage(true);
+  const handleSaveChanges = async () => {
+    console.log("Saving events:", events);
+
+    try {
+      const response = await saveSchedule(events);
+      console.log("Server response:", response);
+
+      if (response.success) {
+        setSavedEvents(events);
+        setShowSavedMessage(true);
+      } else {
+        console.log("Error:", response.message);
+      }
+    } catch (error) {
+      console.error("Save failed:", error);
+    }
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem("savedEvents");
-    if (stored) {
+    const fetchSchedule = async () => {
       try {
-        const parsed = JSON.parse(stored) as EventItem[];
-        setSavedEvents(Array.isArray(parsed) ? parsed : []);
-      } catch {
-        setSavedEvents([]);
+        const response = await getMySchedule();
+
+        if (response.success && response.data) {
+          setEvents(response.data.schedule);
+          setSavedEvents(response.data.schedule);
+        }
+      } catch (error) {
+        console.log(error);
       }
-    }
+    };
+
+    fetchSchedule();
   }, []);
 
   const handleReset = () => {
@@ -141,7 +163,7 @@ export default function MySchedule({ embedded = false }: Props) {
 
   const toggleDay = (d: Day) => {
     setSelectedDays((prev) =>
-      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
+      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d],
     );
   };
 
@@ -189,26 +211,26 @@ export default function MySchedule({ embedded = false }: Props) {
       const dayStart = hourStarts[0] * 60;
 
       const topMinutes = s - dayStart;
-      const durationMinutes = Math.max(12, e - s);
+      const durationMinutes = Math.max(40, e - s + 60);
 
       return {
         top: Math.round(topMinutes * pxPerMinute),
-        height: Math.round(durationMinutes * pxPerMinute),
+        height: Math.round(durationMinutes * pxPerMinute) + 1,
       };
     };
 
-    const colMin = compact ? 110 : 140; // ✅ tighter columns on profile so Sun fits
-const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
+    const colMin = compact ? 130 : 160; // ✅ tighter columns on profile so Sun fits
+    const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
 
     return (
-      <div style={{ width: "100%" }}>
+      <div style={{ width: "100%", overflowX: "auto" }}>
         {/* header row (Time + days headers) */}
         <div style={{ display: "flex", gap: 12 }}>
           <div style={{ width: 90, minWidth: 90 }}>
             <div style={{ ...thStyle, height: 46 }}>Time</div>
           </div>
 
-          <div style={{ flex: 1, overflowX: "auto" }}>
+          <div style={{ flex: 1 }}>
             <div
               style={{
                 display: "grid",
@@ -248,21 +270,21 @@ const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
           <div style={{ width: 90, minWidth: 90 }}>
             {hourStarts.map((h) => (
               <div
-              key={h}
-              style={{
-                ...timeRowStyle,
-                height: rowHeight,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
+                key={h}
+                style={{
+                  ...timeRowStyle,
+                  height: rowHeight,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
                 {formatHourLabel(h)}
               </div>
             ))}
           </div>
 
           {/* days area (NO vertical scroll here) */}
-          <div style={{ flex: 1, overflowX: "auto" }}>
+          <div style={{ flex: 1 }}>
             <div
               style={{
                 display: "grid",
@@ -313,22 +335,21 @@ const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
                             padding: compact ? "8px 10px" : "10px 12px",
                             lineHeight: 1.15,
                             boxShadow: "0 2px 6px rgba(0,0,0,0.10)",
-                            overflow: "hidden",
+                            overflow: "visible",
                             display: "flex",
                             flexDirection: "column",
                             gap: 6,
                           }}
                           title={`${ev.title} ${formatTime12(
-                            ev.start
+                            ev.start,
                           )} – ${formatTime12(ev.end)}`}
                         >
                           <div
                             style={{
                               fontSize: compact ? 13 : 14,
                               fontWeight: 900,
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
+                              whiteSpace: "normal",
+                              wordBreak: "break-word",
                             }}
                           >
                             {ev.title}
@@ -340,11 +361,10 @@ const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
                               fontWeight: 800,
                               opacity: 0.95,
                               whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
+                              textOverflow: "break-word",
                             }}
                           >
-                            {formatTime12(ev.start)} – {formatTime12(ev.end)}
+                            {formatTime12(ev.start)}–{formatTime12(ev.end)}
                           </div>
                         </div>
                       );
@@ -374,35 +394,13 @@ const colTemplate = `repeat(${days.length}, minmax(${colMin}px, 1fr))`;
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-4xl mx-auto pt-10">
         <div className="bg-white rounded-xl shadow-md p-6">
-          {!showUpload && (
-            <div className="mt-6">
-              <Button
-                color="primary"
-                onClick={() => {
-                  setShowUpload(true);
-                  setShowSavedMessage(false);
-                }}
-              >
-                ✏️ Edit My Schedule
-              </Button>
-
-              <div style={{ marginTop: 20 }}>
-                <strong>My Schedule</strong>
-                <div style={{ marginTop: 10 }}>
-                  <ScheduleGrid data={savedEvents} />
-                </div>
-              </div>
-            </div>
-          )}
-
           <div style={{ marginTop: 50 }} />
 
           {showUpload && (
             <div className="mt-6 border rounded-lg p-6 bg-gray-50 relative">
               <button
                 onClick={() => {
-                  setShowUpload(false);
-                  setShowSavedMessage(false);
+                  navigate("/profile");
                 }}
                 style={{
                   position: "absolute",
@@ -538,7 +536,7 @@ const thStyle = {
   verticalAlign: "middle" as const,
   fontWeight: 800,
   color: "#111827",
-  boxSizing: "border-box" as const, 
+  boxSizing: "border-box" as const,
 };
 
 const timeRowStyle = {
@@ -549,5 +547,5 @@ const timeRowStyle = {
   fontWeight: 800,
   background: "#f9fafb",
   color: "#111827",
-  boxSizing: "border-box" as const, 
+  boxSizing: "border-box" as const,
 };

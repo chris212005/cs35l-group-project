@@ -95,7 +95,7 @@ export default function Profile() {
                     type="button"
                     onClick={handleStartEditBio}
                   >
-                    Edit Bio
+                    📝 Edit Bio
                   </button>
                 </>
               ) : (
@@ -143,10 +143,16 @@ export default function Profile() {
               {/* Profile picture card */}
               <div className="card" style={{ marginTop: 14 }}>
                 <div className="sectionTitle">Profile picture</div>
-                <p className="muted">Upload a photo to set your profile picture.</p>
+                <p className="muted">
+                  Upload a photo to set your profile picture.
+                </p>
 
-                <button className="primaryBtn" type="button" onClick={handleUploadClick}>
-                  Upload Photo
+                <button
+                  className="primaryBtn"
+                  type="button"
+                  onClick={handleUploadClick}
+                >
+                  📷 Upload Photo
                 </button>
 
                 {/* hidden file input */}
@@ -162,14 +168,16 @@ export default function Profile() {
               {/* MySchedule card */}
               <div className="card">
                 <div className="sectionTitle">MySchedule</div>
-                <p className="muted">View and edit your weekly class schedule.</p>
+                <p className="muted">
+                  View and edit your weekly class schedule.
+                </p>
 
                 <button
                   className="primaryBtn"
                   type="button"
                   onClick={() => navigate("/myschedule")}
                 >
-                  Edit MySchedule
+                  ✏️ Edit MySchedule
                 </button>
               </div>
             </div>
