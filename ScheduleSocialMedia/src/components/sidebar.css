@@ -2,3 +2,22 @@
     width: 30%;
     padding: 0px 20px;
 }
+
+/*****************************************************
+************MEDIA QUERY FOR USER LIST*****************
+******************************************************/
+
+@media only screen and (max-width: 1000px) {
+    .filter-user-details, .last-message-timestamp {
+      display: none;
+    }
+    .user-search-area, .unread-message-counter {
+        display: none;
+    }
+    .app-sidebar{
+        width: 15%;
+    }
+    .app-chat-area{
+        width: 85%
+    }
+  }

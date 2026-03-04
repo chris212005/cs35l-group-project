@@ -65,6 +65,18 @@ export default function UsersList({ searchKey }: UsersListProps) {
     return false;
   }
 
+  const getlastMessage = (userId: string) => {
+    const chat = allChats.find((chat: Chat) => 
+      chat.members.map((m: Member) => m._id).includes(userId)
+    )
+
+    if(!chat){
+      return "";
+    }else{
+      return chat?.lastMessage?.text;
+    }
+  }
+
   return allUsers
     .filter(
       (user: any) =>
@@ -94,7 +106,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
               <div className="user-display-name">
                 {user.firstname + " " + user.lastname}
               </div>
-              <div className="user-display-email">{user.email}</div>
+              <div className="user-display-email">{getlastMessage(user._id) || user.email }</div>
             </div>
             {!allChats?.find((chat: any) => chat.members.map((m: Member) => m._id).includes(user._id)) && 
             (
