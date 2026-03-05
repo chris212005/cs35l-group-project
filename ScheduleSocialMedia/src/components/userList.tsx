@@ -22,7 +22,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
     allUsers,
     allChats,
     user: currentUser,
-    selectedChat
+    selectedChat,
   } = useSelector((state: any) => state.userReducer);
   const dispatch = useDispatch();
   const startNewChat = async (searchedUserId: string) => {
@@ -47,35 +47,38 @@ export default function UsersList({ searchKey }: UsersListProps) {
   };
 
   const openChat = (selectedUserId: string) => {
-    const chat = allChats.find((chat: Chat) => 
-      chat.members.map((m: Member) => m._id).includes(selectedUserId) && 
-      chat.members.map((m: Member) => m._id).includes(currentUser._id)
-    )
+    const chat = allChats.find(
+      (chat: Chat) =>
+        chat.members.map((m: Member) => m._id).includes(selectedUserId) &&
+        chat.members.map((m: Member) => m._id).includes(currentUser._id),
+    );
 
-    if(chat){
+    if (chat) {
       dispatch(setSelectedChat(chat));
     }
-  }
+  };
 
   const IsSelectedChat = (user: any) => {
-    if(selectedChat){
+    if (selectedChat) {
       return selectedChat.members.map((m: Member) => m._id).includes(user._id);
     }
 
     return false;
-  }
+  };
 
   const getlastMessage = (userId: string) => {
-    const chat = allChats.find((chat: Chat) => 
-      chat.members.map((m: Member) => m._id).includes(userId)
-    )
+    const chat = allChats.find(
+      (chat: Chat) =>
+        chat.members.some((m: Member) => m._id === userId) &&
+        chat.members.some((m: Member) => m._id === currentUser._id),
+    );
 
-    if(!chat){
+    if (!chat || !chat.lastMessage) {
       return "";
-    }else{
-      return chat?.lastMessage?.text;
     }
-  }
+
+    return chat.lastMessage.text;
+  };
 
   return allUsers
     .filter(
@@ -83,11 +86,19 @@ export default function UsersList({ searchKey }: UsersListProps) {
         ((user.firstname.toLowerCase().includes(searchKey.toLowerCase()) ||
           user.lastname.toLowerCase().includes(searchKey.toLowerCase())) &&
           searchKey) ||
-        allChats.some((chat: any) => chat.members.map((m: Member) => m._id).includes(user._id))
+        allChats.some((chat: any) =>
+          chat.members.map((m: Member) => m._id).includes(user._id),
+        ),
     )
     .map((user: any) => (
-      <div className="user-search-filter" onClick={() => openChat(user._id)} key={user._id}>
-        <div className= {IsSelectedChat(user) ? "selected-user": "filtered-user"}>
+      <div
+        className="user-search-filter"
+        onClick={() => openChat(user._id)}
+        key={user._id}
+      >
+        <div
+          className={IsSelectedChat(user) ? "selected-user" : "filtered-user"}
+        >
           <div className="filter-user-display">
             {user.profilePic && (
               <img
@@ -97,7 +108,13 @@ export default function UsersList({ searchKey }: UsersListProps) {
               />
             )}
             {!user.profilePic && (
-              <div className={IsSelectedChat(user) ? "user-selected-avatar" : "user-default-avatar"}>
+              <div
+                className={
+                  IsSelectedChat(user)
+                    ? "user-selected-avatar"
+                    : "user-default-avatar"
+                }
+              >
                 {user.firstname.charAt(0).toUpperCase() +
                   user.lastname.charAt(0).toUpperCase()}
               </div>
@@ -106,10 +123,15 @@ export default function UsersList({ searchKey }: UsersListProps) {
               <div className="user-display-name">
                 {user.firstname + " " + user.lastname}
               </div>
-              <div className="user-display-email">{getlastMessage(user._id) || user.email }</div>
+              <div className="user-display-email">
+                {getlastMessage(user._id)
+                  ? getlastMessage(user._id)
+                  : user.email}
+              </div>
             </div>
-            {!allChats?.find((chat: any) => chat.members.map((m: Member) => m._id).includes(user._id)) && 
-            (
+            {!allChats?.find((chat: any) =>
+              chat.members.map((m: Member) => m._id).includes(user._id),
+            ) && (
               <div className="user-start-chat">
                 <button
                   className="user-start-chat-btn"
