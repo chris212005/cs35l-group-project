@@ -8,9 +8,12 @@ import { getAllMessages } from "../apiCalls/message";
 import type { Message } from "../apiCalls/message";
 import moment from "moment";
 import { setAllChats } from "../redux/usersSlice";
+import { clearUnreadMessagesCount } from "../apiCalls/chat";
 
 interface Member {
   _id: string;
+  firstname: string;
+  lastname: string;
 }
 
 function ChatArea() {
@@ -44,7 +47,7 @@ function ChatArea() {
           if (chat._id === selectedChat._id) {
             return {
               ...chat,
-              lastMessage: { text: message },
+              lastMessage: { text: message, sender: user._id },
             };
           }
           return chat;
@@ -53,7 +56,7 @@ function ChatArea() {
         dispatch(setAllChats(updatedChats));
 
         // also add message to UI immediately
-        setAllMessages((prev) => [...prev, response.data]);
+        setAllMessages([...allMessages, response.data]);
       }
     } catch (error) {
       dispatch(hideLoader());
@@ -97,8 +100,38 @@ function ChatArea() {
     }
   };
 
+  const clearUnreadMessages = async () => {
+    try {
+      dispatch(showLoader());
+      const response = await clearUnreadMessagesCount(selectedChat._id);
+      dispatch(hideLoader());
+
+      if (response.success) {
+        const updatedChats = allChats.map((chat: any) => {
+          if (chat._id === selectedChat._id) {
+            return {
+              ...chat,
+              unreadMessageCount: 0,
+            };
+          }
+          return chat;
+        });
+
+        dispatch(setAllChats(updatedChats));
+      }
+    } catch (error) {
+      dispatch(hideLoader());
+      if (error instanceof Error) {
+        toast.error(error.message); // Access the 'message' property safely
+      } else {
+        toast.error("An unknown error occurred."); // Handle non-Error types
+      }
+    }
+  };
+
   useEffect(() => {
     getMessages();
+    clearUnreadMessages();
   }, [selectedChat]);
 
   return (

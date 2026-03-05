@@ -77,7 +77,21 @@ export default function UsersList({ searchKey }: UsersListProps) {
       return "";
     }
 
-    return chat.lastMessage.text;
+    const isCurrentUserSender = chat.lastMessage.sender === currentUser._id;
+
+    if (isCurrentUserSender) {
+      return `You: ${chat.lastMessage.text}`;
+    } else {
+      const sender = allUsers.find(
+        (u: any) => u._id === chat.lastMessage.sender,
+      );
+
+      const fullName = sender
+        ? `${sender.firstname} ${sender.lastname}`
+        : "User";
+
+      return `${fullName}: ${chat.lastMessage.text}`;
+    }
   };
 
   return allUsers
@@ -124,9 +138,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
                 {user.firstname + " " + user.lastname}
               </div>
               <div className="user-display-email">
-                {getlastMessage(user._id)
-                  ? getlastMessage(user._id)
-                  : user.email}
+                {getlastMessage(user._id) || user.email}
               </div>
             </div>
             {!allChats?.find((chat: any) =>
