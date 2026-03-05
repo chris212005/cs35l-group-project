@@ -56,7 +56,7 @@ function ChatArea() {
         dispatch(setAllChats(updatedChats));
 
         // also add message to UI immediately
-        setAllMessages([...allMessages, response.data]);
+        setAllMessages((prev) => [...prev, response.data]);
       }
     } catch (error) {
       dispatch(hideLoader());
