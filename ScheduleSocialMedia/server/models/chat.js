@@ -9,7 +9,7 @@ const chatSchema = new mongoose.Schema({
         ]
     },
     lastMessage: {
-        type: mongoose.Schema.Types.ObjectId, ref: "message"
+        type: mongoose.Schema.Types.ObjectId, ref: "messsages"
     },
     unreadMessageCount: {
         type: Number,
