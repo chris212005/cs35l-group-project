@@ -43,4 +43,11 @@ i {
   text-align: center;
   vertical-align: middle;
   line-height: 40px;
+  cursor: pointer;
+}
+
+.logged-user-profile-pic:focus {
+  outline: 2px solid rgba(77, 144, 254, 0.9);
+  outline-offset: 2px;
+  border-radius: 50%;
 }

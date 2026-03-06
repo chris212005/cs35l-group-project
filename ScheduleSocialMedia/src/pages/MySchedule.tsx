@@ -201,6 +201,9 @@ export default function MySchedule({ embedded = false }: Props) {
     data: EventItem[];
     compact?: boolean;
   }) => {
+  // hover vs. selected: hover shows temporary bring-to-front, selected persists
+  const [hoverEventId, setHoverEventId] = useState<string | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const rowHeight = compact ? 44 : 60; // smaller on profile
     const pxPerMinute = rowHeight / 60; // keeps hours, but supports minutes
     const gridHeight = hourStarts.length * rowHeight;
@@ -211,7 +214,10 @@ export default function MySchedule({ embedded = false }: Props) {
       const dayStart = hourStarts[0] * 60;
 
       const topMinutes = s - dayStart;
-      const durationMinutes = Math.max(40, e - s + 60);
+      // Use the actual duration (end - start). Previous code added 60 minutes
+      // which made 1-hour events render as 2 hours. Keep a small minimum so
+      // very short events are visible.
+      const durationMinutes = Math.max(30, e - s);
 
       return {
         top: Math.round(topMinutes * pxPerMinute),
@@ -315,60 +321,186 @@ export default function MySchedule({ embedded = false }: Props) {
                     />
                   ))}
 
-                  {/* events */}
-                  {data
-                    .filter((ev) => ev.days.includes(d))
-                    .map((ev) => {
+                  {/* events: compute column layout so overlapping events sit side-by-side */}
+                  {(() => {
+                    const evs = data.filter((ev) => ev.days.includes(d));
+
+                    // map of id -> { colIndex, totalCols }
+                    const layoutMap: Record<string, { col: number; cols: number }> = {};
+
+                    if (evs.length > 0) {
+                      // convert to items with numeric times
+                      const items = evs
+                        .map((ev) => ({
+                          ev,
+                          start: parseTimeHHMM(ev.start),
+                          end: parseTimeHHMM(ev.end),
+                        }))
+                        .sort((a, b) => a.start - b.start || b.end - a.end);
+
+                      const columns: Array<typeof items> = [];
+
+                      for (const item of items) {
+                        let placed = false;
+                        for (let i = 0; i < columns.length; i++) {
+                          const col = columns[i];
+                          const last = col[col.length - 1];
+                          // no overlap if this item's start >= last.end
+                          if (item.start >= last.end) {
+                            col.push(item);
+                            layoutMap[item.ev.id] = { col: i, cols: 0 };
+                            placed = true;
+                            break;
+                          }
+                        }
+
+                        if (!placed) {
+                          columns.push([item]);
+                          layoutMap[item.ev.id] = { col: columns.length - 1, cols: 0 };
+                        }
+                      }
+
+                      const total = columns.length;
+                      // fill total cols for each mapped id
+                      for (let i = 0; i < columns.length; i++) {
+                        for (const it of columns[i]) {
+                          layoutMap[it.ev.id].cols = total;
+                        }
+                      }
+                    }
+
+                    return evs.map((ev) => {
                       const { top, height } = computeEventStyle(ev);
+                      const layout = layoutMap[ev.id] || { col: 0, cols: 1 };
+                      const colIndex = layout.col;
+                      const totalCols = Math.max(1, layout.cols);
+
+                      const leftPercent = (colIndex / totalCols) * 100;
+                      const widthPercent = 100 / totalCols;
+
                       return (
                         <div
                           key={`${ev.id}-${d}`}
+                          onMouseEnter={() => setHoverEventId(ev.id)}
+                          onMouseLeave={() => setHoverEventId(null)}
+                          onClick={() =>
+                            setSelectedEventId((prev) =>
+                              prev === ev.id ? null : ev.id,
+                            )
+                          }
                           style={{
                             position: "absolute",
                             top,
-                            height,
-                            left: 8,
-                            right: 8,
+                            // when selected we want a square card (aspect ratio 1:1)
+                            // otherwise use the computed duration height
+                            height: selectedEventId === ev.id ? undefined : height,
+                            minHeight: height,
+                            // keep event inside its computed column bounds
+                            left: `${leftPercent}%`,
+                            // selected card becomes a bit wider within its column
+                            width: selectedEventId === ev.id ? `calc(${widthPercent}% - 8px)` : `calc(${widthPercent}% - 16px)`,
+                            marginLeft: 8,
                             background: getColor(ev.title),
                             borderRadius: 16,
                             boxSizing: "border-box",
                             padding: compact ? "8px 10px" : "10px 12px",
                             lineHeight: 1.15,
                             boxShadow: "0 2px 6px rgba(0,0,0,0.10)",
-                            overflow: "visible",
+                            // allow overflow visible for selected so the popover can render
+                            overflow: selectedEventId === ev.id ? "visible" : "hidden",
                             display: "flex",
                             flexDirection: "column",
                             gap: 6,
+                            zIndex: (hoverEventId === ev.id || selectedEventId === ev.id) ? 2000 : 1,
+                            cursor: "pointer",
+                            // aspect-ratio will make the selected card square (width -> height)
+                            ...(selectedEventId === ev.id
+                              ? {
+                                  aspectRatio: "1 / 1",
+                                  // ensure it doesn't grow past the bottom of the grid
+                                  maxHeight: `${Math.max(40, gridHeight - top - 8)}px`,
+                                }
+                              : {}),
                           }}
                           title={`${ev.title} ${formatTime12(
                             ev.start,
                           )} – ${formatTime12(ev.end)}`}
                         >
-                          <div
-                            style={{
-                              fontSize: compact ? 13 : 14,
-                              fontWeight: 900,
-                              whiteSpace: "normal",
-                              wordBreak: "break-word",
-                            }}
-                          >
-                            {ev.title}
-                          </div>
+                          {selectedEventId === ev.id ? (
+                            // when selected show a very minimal card to keep the grid clean;
+                            // full details live in the popover to the right
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                height: "100%",
+                                fontSize: compact ? 12 : 13,
+                                fontWeight: 900,
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                padding: "6px",
+                              }}
+                            >
+                              {ev.title.length > 10 ? `${ev.title.slice(0, 10)}…` : ev.title}
+                            </div>
+                          ) : (
+                            <>
+                              <div
+                                style={{
+                                  // slightly reduce font when multiple columns to avoid overlap
+                                  fontSize: compact ? 13 : totalCols > 1 ? 12 : 14,
+                                  fontWeight: 900,
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  paddingRight: 6,
+                                }}
+                              >
+                                {ev.title}
+                              </div>
 
-                          <div
-                            style={{
-                              fontSize: compact ? 11 : 12,
-                              fontWeight: 800,
-                              opacity: 0.95,
-                              whiteSpace: "nowrap",
-                              textOverflow: "break-word",
-                            }}
-                          >
-                            {formatTime12(ev.start)}–{formatTime12(ev.end)}
-                          </div>
+                              <div
+                                style={{
+                                  fontSize: compact ? 11 : totalCols > 1 ? 10 : 12,
+                                  fontWeight: 800,
+                                  opacity: 0.95,
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  paddingRight: 6,
+                                }}
+                              >
+                                {formatTime12(ev.start)}–{formatTime12(ev.end)}
+                              </div>
+                            </>
+                          )}
+                          {/* Popover with full details (renders when selected) */}
+                          {selectedEventId === ev.id && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: 0,
+                                left: `calc(100% + 8px)`,
+                                width: 220,
+                                background: "white",
+                                border: "1px solid rgba(0,0,0,0.08)",
+                                boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+                                borderRadius: 8,
+                                padding: 10,
+                                zIndex: 3000,
+                                color: "#111827",
+                              }}
+                            >
+                              <div style={{ fontWeight: 900, marginBottom: 6 }}>{ev.title}</div>
+                              <div style={{ fontWeight: 800, color: "#374151" }}>{formatTime12(ev.start)} – {formatTime12(ev.end)}</div>
+                            </div>
+                          )}
                         </div>
                       );
-                    })}
+                    });
+                  })()}
                 </div>
               ))}
             </div>
