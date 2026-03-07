@@ -3,9 +3,18 @@ import { useNavigate } from "react-router-dom";
 import MySchedule from "./MySchedule";
 import "./Profile.css";
 import TopBar from "../components/TopBar";
+import { useSelector } from "react-redux";
 
 export default function Profile() {
+
   const navigate = useNavigate();
+  const currentUser = useSelector((state: any) => state.userReducer.user);
+
+  //Just for capitalizing the first letter of first name and last name
+  function capitalize(name?: string) {
+    if (!name) return "";
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
 
   // ---------- Profile picture ----------
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -85,7 +94,9 @@ export default function Profile() {
             </div>
 
             <div className="profileInfo">
-              <div className="username">user_name</div>
+              <div className="username">{capitalize(currentUser?.firstname || "")}{" "} 
+                                        {capitalize(currentUser?.lastname || "")}
+              </div>
 
               {!editingBio ? (
                 <>
