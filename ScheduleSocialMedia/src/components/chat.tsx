@@ -9,6 +9,7 @@ import type { Message } from "../apiCalls/message";
 import moment from "moment";
 import { setAllChats } from "../redux/usersSlice";
 import { clearUnreadMessagesCount } from "../apiCalls/chat";
+import { useNavigate } from "react-router-dom";
 
 interface Member {
   _id: string;
@@ -132,6 +133,13 @@ function ChatArea() {
     }
   };
 
+  const navigate = useNavigate();
+
+  const viewSchedule = () => {
+    if (!selectedUser?._id) return;
+    navigate(`/schedule/${selectedUser._id}`);
+  };
+
   useEffect(() => {
     getMessages();
     if (selectedChat?.lastMessage?.sender !== user._id) {
@@ -144,7 +152,13 @@ function ChatArea() {
       {selectedChat && (
         <div className="app-chat-area">
           <div className="app-chat-area-header">
-            {selectedUser?.firstname + " " + selectedUser?.lastname}
+            <button className="view-schedule-btn" onClick={viewSchedule}>
+              📅 View Their Schedule
+            </button>
+
+            <span className="chat-user-name">
+              {selectedUser?.firstname + " " + selectedUser?.lastname}
+            </span>
           </div>
 
           <div className="main-chat-area">

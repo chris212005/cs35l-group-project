@@ -20,12 +20,34 @@
 *************CSS STYLES FOR CHAT AREA HEADER************
 ********************************************************/
 .app-chat-area-header{
-    padding: 10px 30px;
-    margin-bottom: 10px;
-    border-bottom: #bbb 1px solid;
-    text-align: right;
-    font-weight: bold;
-    color: #e74c3c;
+  padding: 10px 30px;
+  margin-bottom: 10px;
+  border-bottom: #bbb 1px solid;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  color: #e74c3c;
+}
+
+.view-schedule-btn{
+  border: none;
+  background-color: #e74c3c;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.view-schedule-btn:hover{
+  background-color: #cf3e2e;
+}
+
+.chat-user-name{
+  color: #e74c3c;
 }
 
 /*******************************************************

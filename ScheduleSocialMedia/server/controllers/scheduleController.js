@@ -86,3 +86,23 @@ router.delete("/delete-schedule", authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+
+// Get schedule of another user
+router.get("/get-user-schedule/:userId", authMiddleware, async (req, res) => {
+  try {
+
+    const schedule = await Schedule.findOne({ userId: req.params.userId });
+
+    res.send({
+      message: "User schedule fetched successfully",
+      success: true,
+      data: schedule
+    });
+
+  } catch (error) {
+    res.status(400).send({
+      message: error.message,
+      success: false
+    });
+  }
+});
