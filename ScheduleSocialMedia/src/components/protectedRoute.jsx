@@ -16,17 +16,23 @@ function ProtectedRoute({children}){
     const getloggedInUser = async () => {
         let response = null;
         try{
+
             dispatch(showLoader())
             response = await getLoggedUser();
+
+
             dispatch(hideLoader());
 
             if(response.success){
+
                 dispatch(setUser(response.data));
             }else{
+
                 toast.error(response.message);
                 window.location.href = '/login';
             }
         }catch(error){
+
             dispatch(hideLoader());
             navigate("/login");
         }
@@ -35,18 +41,23 @@ function ProtectedRoute({children}){
     const getAllUsersFromDb = async () => {
         let response = null;
         try{
+
             dispatch(showLoader())
             response = await getAllUsers();
+
+
             dispatch(hideLoader());
 
             if(response.success){
                 dispatch(setAllUsers(response.data));
             }else{
+
                 toast.error(response.message);
                 window.location.href = '/login';
             }
 
         }catch(error){
+
             dispatch(hideLoader());
             navigate("/login");
         }
@@ -55,6 +66,7 @@ function ProtectedRoute({children}){
     const getCurrentUserChats = async () => {
         try {
             const response = await getAllChats();
+
             if(response.success){
                 dispatch(setAllChats(response.data))
             }
