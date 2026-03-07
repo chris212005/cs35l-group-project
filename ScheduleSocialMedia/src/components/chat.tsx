@@ -51,7 +51,7 @@ function ChatArea() {
           if (chat._id === selectedChat._id) {
             return {
               ...chat,
-              lastMessage: { text: message, sender: user._id },
+              lastMessage: response.data, // update last message to the one we just sent
             };
           }
           return chat;
