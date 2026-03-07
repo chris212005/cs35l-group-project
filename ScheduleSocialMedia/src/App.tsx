@@ -32,11 +32,16 @@ export default function App() {
         {/* TESTING: No ProtectedRoute for now */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/messaging" element={<Messaging />} />
-        <Route path="/find-users" element={
-          <ProtectedRoute>
-            <FindUsers />
-          </ProtectedRoute>} />
+        <Route
+          path="/find-users"
+          element={
+            <ProtectedRoute>
+              <FindUsers />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/myschedule" element={<MySchedule />} />
+        <Route path="/schedule/:userId" element={<MySchedule embedded />} />
       </Routes>
     </div>
   );

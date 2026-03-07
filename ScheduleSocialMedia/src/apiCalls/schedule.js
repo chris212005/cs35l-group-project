@@ -13,7 +13,7 @@ export const saveSchedule = async (schedule) => {
   }
 };
 
-// GET schedule
+// GET my schedule
 export const getMySchedule = async () => {
   try {
     const response = await axiosInstance.get(
@@ -25,7 +25,19 @@ export const getMySchedule = async () => {
   }
 };
 
-// Delete Schedule
+// ⭐ GET another user's schedule
+export const getUserSchedule = async (userId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/schedule/get-user-schedule/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+// DELETE schedule
 export const deleteSchedule = async () => {
   try {
     const response = await axiosInstance.delete(

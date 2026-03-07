@@ -1,7 +1,13 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-// @ts-ignore
-import { saveSchedule, getMySchedule } from "../apiCalls/schedule";
+
+import {
+  saveSchedule,
+  getMySchedule,
+  getUserSchedule,
+} from "../apiCalls/schedule";
+
+import { useParams } from "react-router-dom";
 
 type Props = {
   /** If true, renders ONLY the schedule grid (no full-page wrappers / edit UI) */
@@ -102,6 +108,11 @@ export default function MySchedule({ embedded = false }: Props) {
   const [savedEvents, setSavedEvents] = useState<EventItem[]>([]);
 
   const navigate = useNavigate();
+  const { userId } = useParams();
+
+  if (!events) {
+    return <div style={{ padding: 40 }}>Loading schedule...</div>;
+  }
 
   const [title, setTitle] = useState("");
   const [selectedDays, setSelectedDays] = useState<Day[]>(["Mon"]);
@@ -136,11 +147,24 @@ export default function MySchedule({ embedded = false }: Props) {
   useEffect(() => {
     const fetchSchedule = async () => {
       try {
-        const response = await getMySchedule();
+        let response;
 
-        if (response.success && response.data) {
-          setEvents(response.data.schedule);
-          setSavedEvents(response.data.schedule);
+        if (userId) {
+          // viewing someone else's schedule
+          response = await getUserSchedule(userId);
+        } else {
+          // viewing your own schedule
+          response = await getMySchedule();
+        }
+
+        if (response.success) {
+          const schedule = response.data?.schedule || response.data || [];
+
+          setEvents(schedule);
+          setSavedEvents(schedule);
+        } else {
+          setEvents([]);
+          setSavedEvents([]);
         }
       } catch (error) {
         console.log(error);
@@ -148,7 +172,7 @@ export default function MySchedule({ embedded = false }: Props) {
     };
 
     fetchSchedule();
-  }, []);
+  }, [userId]);
 
   const handleReset = () => {
     setEvents([]);
@@ -195,15 +219,15 @@ export default function MySchedule({ embedded = false }: Props) {
 
   // shared schedule grid component
   const ScheduleGrid = ({
-    data,
+    data = [],
     compact = false,
   }: {
     data: EventItem[];
     compact?: boolean;
   }) => {
-  // hover vs. selected: hover shows temporary bring-to-front, selected persists
-  const [hoverEventId, setHoverEventId] = useState<string | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+    // hover vs. selected: hover shows temporary bring-to-front, selected persists
+    const [hoverEventId, setHoverEventId] = useState<string | null>(null);
+    const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const rowHeight = compact ? 44 : 60; // smaller on profile
     const pxPerMinute = rowHeight / 60; // keeps hours, but supports minutes
     const gridHeight = hourStarts.length * rowHeight;
@@ -323,10 +347,15 @@ export default function MySchedule({ embedded = false }: Props) {
 
                   {/* events: compute column layout so overlapping events sit side-by-side */}
                   {(() => {
-                    const evs = data.filter((ev) => ev.days.includes(d));
+                    const evs = (data || []).filter((ev) =>
+                      ev.days?.includes(d),
+                    );
 
                     // map of id -> { colIndex, totalCols }
-                    const layoutMap: Record<string, { col: number; cols: number }> = {};
+                    const layoutMap: Record<
+                      string,
+                      { col: number; cols: number }
+                    > = {};
 
                     if (evs.length > 0) {
                       // convert to items with numeric times
@@ -356,7 +385,10 @@ export default function MySchedule({ embedded = false }: Props) {
 
                         if (!placed) {
                           columns.push([item]);
-                          layoutMap[item.ev.id] = { col: columns.length - 1, cols: 0 };
+                          layoutMap[item.ev.id] = {
+                            col: columns.length - 1,
+                            cols: 0,
+                          };
                         }
                       }
 
@@ -393,12 +425,16 @@ export default function MySchedule({ embedded = false }: Props) {
                             top,
                             // when selected we want a square card (aspect ratio 1:1)
                             // otherwise use the computed duration height
-                            height: selectedEventId === ev.id ? undefined : height,
+                            height:
+                              selectedEventId === ev.id ? undefined : height,
                             minHeight: height,
                             // keep event inside its computed column bounds
                             left: `${leftPercent}%`,
                             // selected card becomes a bit wider within its column
-                            width: selectedEventId === ev.id ? `calc(${widthPercent}% - 8px)` : `calc(${widthPercent}% - 16px)`,
+                            width:
+                              selectedEventId === ev.id
+                                ? `calc(${widthPercent}% - 8px)`
+                                : `calc(${widthPercent}% - 16px)`,
                             marginLeft: 8,
                             background: getColor(ev.title),
                             borderRadius: 16,
@@ -407,11 +443,16 @@ export default function MySchedule({ embedded = false }: Props) {
                             lineHeight: 1.15,
                             boxShadow: "0 2px 6px rgba(0,0,0,0.10)",
                             // allow overflow visible for selected so the popover can render
-                            overflow: selectedEventId === ev.id ? "visible" : "hidden",
+                            overflow:
+                              selectedEventId === ev.id ? "visible" : "hidden",
                             display: "flex",
                             flexDirection: "column",
                             gap: 6,
-                            zIndex: (hoverEventId === ev.id || selectedEventId === ev.id) ? 2000 : 1,
+                            zIndex:
+                              hoverEventId === ev.id ||
+                              selectedEventId === ev.id
+                                ? 2000
+                                : 1,
                             cursor: "pointer",
                             // aspect-ratio will make the selected card square (width -> height)
                             ...(selectedEventId === ev.id
@@ -443,14 +484,20 @@ export default function MySchedule({ embedded = false }: Props) {
                                 padding: "6px",
                               }}
                             >
-                              {ev.title.length > 10 ? `${ev.title.slice(0, 10)}…` : ev.title}
+                              {ev.title.length > 10
+                                ? `${ev.title.slice(0, 10)}…`
+                                : ev.title}
                             </div>
                           ) : (
                             <>
                               <div
                                 style={{
                                   // slightly reduce font when multiple columns to avoid overlap
-                                  fontSize: compact ? 13 : totalCols > 1 ? 12 : 14,
+                                  fontSize: compact
+                                    ? 13
+                                    : totalCols > 1
+                                      ? 12
+                                      : 14,
                                   fontWeight: 900,
                                   whiteSpace: "nowrap",
                                   overflow: "hidden",
@@ -463,7 +510,11 @@ export default function MySchedule({ embedded = false }: Props) {
 
                               <div
                                 style={{
-                                  fontSize: compact ? 11 : totalCols > 1 ? 10 : 12,
+                                  fontSize: compact
+                                    ? 11
+                                    : totalCols > 1
+                                      ? 10
+                                      : 12,
                                   fontWeight: 800,
                                   opacity: 0.95,
                                   whiteSpace: "nowrap",
@@ -493,8 +544,15 @@ export default function MySchedule({ embedded = false }: Props) {
                                 color: "#111827",
                               }}
                             >
-                              <div style={{ fontWeight: 900, marginBottom: 6 }}>{ev.title}</div>
-                              <div style={{ fontWeight: 800, color: "#374151" }}>{formatTime12(ev.start)} – {formatTime12(ev.end)}</div>
+                              <div style={{ fontWeight: 900, marginBottom: 6 }}>
+                                {ev.title}
+                              </div>
+                              <div
+                                style={{ fontWeight: 800, color: "#374151" }}
+                              >
+                                {formatTime12(ev.start)} –{" "}
+                                {formatTime12(ev.end)}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -513,10 +571,33 @@ export default function MySchedule({ embedded = false }: Props) {
   };
 
   // ---------- EMBEDDED VIEW (Profile preview) ----------
+
   if (embedded) {
     return (
-      <div style={{ marginTop: 10, width: "100%" }}>
-        <ScheduleGrid data={savedEvents} compact />
+      <div style={{ width: "100%", position: "relative" }}>
+        {userId && (
+          <button
+            onClick={() => navigate("/find-users")}
+            style={{
+              position: "fixed",
+              top: 12,
+              right: 12,
+              background: "#1FA64A",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              padding: "4px 8px",
+              zIndex: 1000,
+            }}
+          >
+            X
+          </button>
+        )}
+
+        {/* push ONLY the table down */}
+        <div style={{ marginTop: 60 }}>
+          <ScheduleGrid data={savedEvents} compact />
+        </div>
       </div>
     );
   }
@@ -554,7 +635,7 @@ export default function MySchedule({ embedded = false }: Props) {
               >
                 {/* LEFT = TABLE */}
                 <div style={{ flex: 1, overflowX: "auto" }}>
-                  <ScheduleGrid data={events} />
+                  <ScheduleGrid data={events || []} />
                 </div>
 
                 {/* RIGHT = CONTROLS */}
