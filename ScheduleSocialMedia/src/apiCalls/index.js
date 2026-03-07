@@ -1,7 +1,20 @@
 import axios from "axios";
 
-export const axiosInstance = axios.create({
-    headers: {
-        authorization: `Bearer ${localStorage.getItem('token')}`
+export const axiosInstance = axios.create();
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      config.headers.authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.authorization;
     }
-});
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
