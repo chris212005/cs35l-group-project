@@ -246,7 +246,7 @@ function ChatArea({ socket }: any) {
                         <i
                           className="fa fa-check-circle"
                           aria-hidden="true"
-                          style={{ color: "#e74c3c" }}
+                          style={{ color: "#64748b" }}
                         ></i>
                       )}
                     </div>
