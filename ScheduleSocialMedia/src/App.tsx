@@ -30,8 +30,22 @@ export default function App() {
         <Route path="/signup" element={<SignUpPage />} />
 
         {/* TESTING: No ProtectedRoute for now */}
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/messaging" element={<Messaging />} />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/messaging" 
+          element={
+            <ProtectedRoute>
+              <Messaging />
+            </ProtectedRoute>
+          } 
+        />
         <Route
           path="/find-users"
           element={

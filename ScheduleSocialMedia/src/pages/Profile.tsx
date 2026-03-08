@@ -9,6 +9,7 @@ export default function Profile() {
 
   const navigate = useNavigate();
   const currentUser = useSelector((state: any) => state.userReducer.user);
+  console.log("PROFILE currentUser =", currentUser);
 
   //Just for capitalizing the first letter of first name and last name
   function capitalize(name?: string) {
@@ -94,8 +95,7 @@ export default function Profile() {
             </div>
 
             <div className="profileInfo">
-              <div className="username">{capitalize(currentUser?.firstname || "")}{" "} 
-                                        {capitalize(currentUser?.lastname || "")}
+              <div className="username">{capitalize(currentUser?.firstname || "")} {capitalize(currentUser?.lastname || "")}
               </div>
 
               {!editingBio ? (

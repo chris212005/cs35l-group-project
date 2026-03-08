@@ -7,7 +7,7 @@ export default function Header() {
   const { user } = useSelector((state: any) => state.userReducer);
   const navigate = useNavigate();
 
-  console.log(user);
+  console.log("HEADER user:", user);
 
   function getFullName() {
     const fname = user?.firstname ? user.firstname.toUpperCase() : "";
