@@ -11,7 +11,7 @@
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  height: 85vh;
+  height: 80vh;
 }
 
 /*******************************************************
@@ -26,13 +26,12 @@
   align-items: center;
   gap: 10px;
   font-weight: bold;
-  color: #e74c3c;
+  color: rgb(45, 104, 196);
 }
 
 .view-schedule-btn{
   border: none;
-  background-color: #e74c3c;
-  color: white;
+  background-color: rgb(242, 169, 0);
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
@@ -41,11 +40,11 @@
 }
 
 .view-schedule-btn:hover{
-  background-color: #cf3e2e;
+  background-color: #d97706;
 }
 
 .chat-user-name{
-  color: #e74c3c;
+  color: rgb(242, 169, 0);
 }
 
 /*******************************************************
@@ -60,12 +59,14 @@
 .send-message-div{
   position: relative;
   margin-top: 20px;
+  padding-right: 20px;
 }
 
 .send-message-input{
-  width: 100%;
+  width: calc(100% - 10%);
+  margin-left: 20px;
   height: 40px;
-  padding: 10px 20px;
+  padding: 10px 60px 10px 16px;
   border: none;
   border-radius: 5px;
   color: #28282B;
@@ -74,20 +75,21 @@
 
 .send-message-btn{
   position: absolute;
-  right: 10px;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 25px;
-  color: #e74c3c;
+  color: rgb(45, 104, 196);
   cursor: pointer;
   border: none;
   background-color: transparent;
-  margin-top: 5px;
 }
 
 .send-emoji-btn{
   position: absolute;
   right: 50px;
   font-size: 25px;
-  color: #e74c3c;
+  color: rgb(45, 104, 196);
   cursor: pointer;
   border: none;
   background-color: transparent;
@@ -98,7 +100,7 @@
   position: absolute;
   right: 80px;
   font-size: 25px;
-  color: #e74c3c;
+  color: rgb(45, 104, 196);
   cursor: pointer;
   border: none;
   background-color: transparent;
@@ -120,10 +122,10 @@
 }
 
 .send-message{ 
-  background-color: #e74c3c;
+  background-color: rgb(45, 104, 196);
   color: white;
-  margin-left: 100px;
-  border-top-right-radius: 0px;
+  margin-left: auto;
+  border-top-right-radius: 4px;
 }
 
 .received-message{ 
@@ -155,11 +157,11 @@ font-size: 13px;
 
 /* Handle */
 .main-chat-area::-webkit-scrollbar-thumb {
-  background: #e74c3c; 
+  background: rgb(45, 104, 196); 
   border-radius: 10px;
 }
 
 /* Handle on hover */
 .main-chat-area::-webkit-scrollbar-thumb:hover {
-  background: #e74c3c; 
+  background: rgb(45, 104, 196); 
 }

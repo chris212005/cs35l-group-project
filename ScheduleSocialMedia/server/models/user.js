@@ -23,6 +23,12 @@ const userSchema = mongoose.Schema({
         type: String,
         required: false
     }
+    ,
+    bio: {
+        type: String,
+        required: false,
+        default: ""
+    }
 }, {timeStamps: true})
 
 module.exports = mongoose.model('users', userSchema);

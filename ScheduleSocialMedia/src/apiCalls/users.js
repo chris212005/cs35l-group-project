@@ -20,5 +20,15 @@ export const getAllUsers = async () => {
     }
 }
 
+export const updateProfile = async (payload) => {
+    try {
+        const response = await axiosInstance.put('/api/user/update-profile', payload);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        return null;
+    }
+}
+
 
 

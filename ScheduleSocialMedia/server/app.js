@@ -8,13 +8,15 @@ const scheduleRouter = require('./controllers/scheduleController');
 
 
 //Use auth controller routers
-app.use(express.json());
 const server = require("http").createServer(app);
 
 const io = require("socket.io")(server, {cors: {
     origin: "http://localhost:5173", 
     methods: ['GET', 'POST']
 }})
+// accept larger JSON payloads (profile pictures encoded as data URLs can be large)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/auth', authrouter);
 app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
