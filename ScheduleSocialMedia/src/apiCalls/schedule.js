@@ -4,7 +4,7 @@ import { axiosInstance } from "./index";
 export const saveSchedule = async (schedule) => {
   try {
     const response = await axiosInstance.post(
-      "/api/schedule/save-schedule",
+      url + "/api/schedule/save-schedule",
       { schedule }
     );
     return response.data;
@@ -17,7 +17,7 @@ export const saveSchedule = async (schedule) => {
 export const getMySchedule = async () => {
   try {
     const response = await axiosInstance.get(
-      "/api/schedule/get-user-schedule"
+      url + "/api/schedule/get-user-schedule"
     );
     return response.data;
   } catch (error) {
@@ -29,7 +29,7 @@ export const getMySchedule = async () => {
 export const getUserSchedule = async (userId) => {
   try {
     const response = await axiosInstance.get(
-      `/api/schedule/get-user-schedule/${userId}`
+      url + `/api/schedule/get-user-schedule/${userId}`
     );
     return response.data;
   } catch (error) {
@@ -41,7 +41,7 @@ export const getUserSchedule = async (userId) => {
 export const deleteSchedule = async () => {
   try {
     const response = await axiosInstance.delete(
-      "/api/schedule/delete-schedule"
+      url + "/api/schedule/delete-schedule"
     );
     return response.data;
   } catch (error) {
