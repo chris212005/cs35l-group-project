@@ -1,19 +1,32 @@
 const router = require("express").Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const Schedule = require("../models/schedule");
+const mongoose = require("mongoose");
 
 
 // Save / Update Schedule
 router.post("/save-schedule", authMiddleware, async (req, res) => {
   try {
-    const { schedule } = req.body;
+    let { schedule } = req.body;
+
+    // defensive: ensure schedule is an array
+    if (!Array.isArray(schedule)) schedule = [];
+
+    // ensure each class item has an `id` (schema requires it). If missing, generate one.
+    schedule = schedule.map((item) => {
+      if (!item.id) {
+        // create a string id using ObjectId
+        return { ...item, id: new mongoose.Types.ObjectId().toString() };
+      }
+      return item;
+    });
 
     // check if user already has schedule
     let existingSchedule = await Schedule.findOne({ userId: req.userId });
 
     if (existingSchedule) {
-      // update existing
-      existingSchedule.schedule = schedule;
+  // update existing
+  existingSchedule.schedule = schedule;
       await existingSchedule.save();
 
       return res.send({

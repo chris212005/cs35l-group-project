@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import MySchedule from "./MySchedule";
 import "./Profile.css";
 import TopBar from "../components/TopBar";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "../redux/usersSlice";
 
 export default function Profile() {
 
   const navigate = useNavigate();
   const currentUser = useSelector((state: any) => state.userReducer.user);
+  const dispatch = useDispatch();
   console.log("PROFILE currentUser =", currentUser);
 
   //Just for capitalizing the first letter of first name and last name
@@ -26,17 +28,18 @@ export default function Profile() {
   const [editingBio, setEditingBio] = useState(false);
   const [draftBio, setDraftBio] = useState("");
 
-  // load from localStorage on mount
+  // initialize from Redux currentUser (populated by ProtectedRoute)
   useEffect(() => {
-    const storedPic = localStorage.getItem("profilePic");
-    if (storedPic) setProfilePic(storedPic);
-
-    const storedBio = localStorage.getItem("profileBio");
-    if (storedBio) {
-      setBio(storedBio);
-      setDraftBio(storedBio);
+    if (currentUser) {
+      if (currentUser.profilePic) {
+        setProfilePic(currentUser.profilePic);
+      }
+      if (currentUser.bio) {
+        setBio(currentUser.bio);
+        setDraftBio(currentUser.bio);
+      }
     }
-  }, []);
+  }, [currentUser]);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -53,7 +56,32 @@ export default function Profile() {
     reader.onload = () => {
       const dataUrl = String(reader.result || "");
       setProfilePic(dataUrl);
-      localStorage.setItem("profilePic", dataUrl);
+
+      // Persist to server
+      (async () => {
+        try {
+          const token = localStorage.getItem("token");
+          const resp = await fetch("/api/user/update-profile", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ profilePic: dataUrl }),
+          });
+          const json = await resp.json();
+          if (json && json.success) {
+            dispatch(setUser(json.data));
+          } else {
+            // server didn't return success, keep the selected image in local UI
+            setProfilePic(dataUrl);
+          }
+        } catch (error) {
+          console.error("Error updating profile picture:", error);
+          // keep the selected image locally on error
+          setProfilePic(dataUrl);
+        }
+      })();
     };
     reader.readAsDataURL(file);
 
@@ -69,8 +97,35 @@ export default function Profile() {
   const handleSaveBio = () => {
     const cleaned = draftBio.trim();
     setBio(cleaned);
-    localStorage.setItem("profileBio", cleaned);
     setEditingBio(false);
+
+    // persist bio to server
+    (async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const resp = await fetch("/api/user/update-profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ bio: cleaned }),
+        });
+        const json = await resp.json();
+        if (json && json.success) {
+          dispatch(setUser(json.data));
+          // updated user saved; update local state
+          setBio(json.data.bio || cleaned);
+        } else {
+          // server didn't return success: keep local state
+          setBio(cleaned);
+        }
+      } catch (error) {
+        console.error("Error updating bio:", error);
+        // keep local state on error
+        setBio(cleaned);
+      }
+    })();
   };
 
   const handleCancelBio = () => {
