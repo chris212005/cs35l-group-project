@@ -1,11 +1,13 @@
 import "./header.css";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 
 export default function Header() {
   const { user } = useSelector((state: any) => state.userReducer);
   const navigate = useNavigate();
+  const [profilePic, setProfilePic] = useState<string | null>(null);
 
   console.log("HEADER user:", user);
 
@@ -20,6 +22,10 @@ export default function Header() {
     const linitial = user?.lastname ? user.lastname.toUpperCase()[0] : "";
     return (finitial + linitial).trim();
   }
+  useEffect(() => {
+    const stored = localStorage.getItem("profilePic");
+    if (stored) setProfilePic(stored);
+  }, []);
   return (
     <div className="app-header">
       <div className="app-logo">
@@ -41,7 +47,13 @@ export default function Header() {
             }
           }}
         >
-          {getInitials()}
+          {profilePic ? (
+            // show image when available
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={profilePic} alt="Profile" />
+          ) : (
+            getInitials()
+          )}
         </div>
       </div>
     </div>
