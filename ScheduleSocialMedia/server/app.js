@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const authrouter = require('./controllers/authController');
 const userRouter = require('./controllers/userController');
@@ -15,6 +16,7 @@ const io = require("socket.io")(server, {cors: {
     methods: ['GET', 'POST']
 }})
 // accept larger JSON payloads (profile pictures encoded as data URLs can be large)
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/auth', authrouter);

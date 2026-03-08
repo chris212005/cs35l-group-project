@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 import { createNewChat } from "../apiCalls/chat";
 import { hideLoader, showLoader } from "../redux/loaderSlice";
 import { setAllChats, setSelectedChat } from "../redux/usersSlice";
-import { all } from "axios";
 import { useEffect } from "react";
 import store from "../redux/store";
 
