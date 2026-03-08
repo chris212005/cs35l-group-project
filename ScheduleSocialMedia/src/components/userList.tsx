@@ -5,9 +5,12 @@ import { createNewChat } from "../apiCalls/chat";
 import { hideLoader, showLoader } from "../redux/loaderSlice";
 import { setAllChats, setSelectedChat } from "../redux/usersSlice";
 import { all } from "axios";
+import { useEffect } from "react";
+import store from "../redux/store";
 
 type UsersListProps = {
   searchKey: string;
+  socket: any;
 };
 
 interface Member {
@@ -18,7 +21,7 @@ interface Chat {
   members: Member[];
 }
 
-export default function UsersList({ searchKey }: UsersListProps) {
+export default function UsersList({ searchKey, socket }: UsersListProps) {
   const {
     allUsers,
     allChats,
@@ -55,7 +58,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
     const chat = allChats.find(
       (chat: Chat) =>
         chat.members.some((m: Member) => m._id === selectedUserId) &&
-        chat.members.some((m: Member) => m._id === currentUser._id),
+        chat.members.some((m: Member) => m._id === currentUser._id)
     );
 
     if (chat) {
@@ -73,7 +76,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
     return allChats.find(
       (chat: Chat) =>
         chat.members.some((m: Member) => m._id === userId) &&
-        chat.members.some((m: Member) => m._id === currentUser._id),
+        chat.members.some((m: Member) => m._id === currentUser._id)
     );
   };
 
@@ -109,8 +112,41 @@ export default function UsersList({ searchKey }: UsersListProps) {
     });
   };
 
+  useEffect(() => {
+    socket.on("receive-message", (message: any) => {
+      const selectedChat: any = store.getState().userReducer.selectedChat;
+      let allChats: any[] = store.getState().userReducer.allChats;
+
+      if (selectedChat?._id !== message.chatId) {
+        const updatedchats = allChats.map((chat: any) => {
+          if (chat._id === message.chatId) {
+            return {
+              ...chat,
+              unreadMessageCount: (chat?.unreadMessageCount || 0) + 1,
+              lastMessage: message,
+            };
+          }
+          return chat;
+        });
+        allChats = updatedchats;
+      }
+      //1.Find the latest Chat
+      const latestChat = allChats.find((chat) => chat._id === message.chatId);
+
+      //2. Get all other chats
+      const otherChats = allChats.filter((chat) => chat._id !== message.chatId);
+
+      //3. Create a new array latest chat on top & then other chats
+      allChats = [latestChat, ...otherChats];
+
+      dispatch(setAllChats(allChats));
+    });
+  }, []);
+
   const getUnreadMessageCount = (userId: string) => {
     const chat = getChat(userId);
+
+    console.log("CHAT OBJECT:", chat);
 
     if (
       chat &&
@@ -143,12 +179,12 @@ export default function UsersList({ searchKey }: UsersListProps) {
       });
 
       const usersFromChats = sortedChats.map((chat: any) =>
-        chat.members.find((m: Member) => m._id !== currentUser._id),
+        chat.members.find((m: Member) => m._id !== currentUser._id)
       );
 
       const uniqueUsers = usersFromChats.filter(
         (user: any, index: number, self: any[]) =>
-          user && index === self.findIndex((u) => u._id === user._id),
+          user && index === self.findIndex((u) => u._id === user._id)
       );
 
       return uniqueUsers;
@@ -156,7 +192,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
       return allUsers.filter(
         (user: any) =>
           user.firstname.toLowerCase().includes(searchKey.toLowerCase()) ||
-          user.lastname.toLowerCase().includes(searchKey.toLowerCase()),
+          user.lastname.toLowerCase().includes(searchKey.toLowerCase())
       );
     }
   }
@@ -222,7 +258,7 @@ export default function UsersList({ searchKey }: UsersListProps) {
 
                 {/* Start chat button */}
                 {!allChats?.find((chat: any) =>
-                  chat.members.map((m: Member) => m._id).includes(user._id),
+                  chat.members.map((m: Member) => m._id).includes(user._id)
                 ) && (
                   <div className="user-start-chat">
                     <button

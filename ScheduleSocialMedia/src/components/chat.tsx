@@ -10,6 +10,7 @@ import moment from "moment";
 import { setAllChats } from "../redux/usersSlice";
 import { clearUnreadMessagesCount } from "../apiCalls/chat";
 import { useNavigate } from "react-router-dom";
+import store from "../redux/store";
 
 interface Member {
   _id: string;
@@ -17,16 +18,16 @@ interface Member {
   lastname: string;
 }
 
-function ChatArea() {
+function ChatArea({ socket }: any) {
   const dispatch = useDispatch();
   const { selectedChat, user, allChats } = useSelector(
-    (state: any) => state.userReducer,
+    (state: any) => state.userReducer
   );
 
   console.log(user);
 
   const selectedUser = selectedChat?.members?.find(
-    (u: Member) => u._id !== user._id,
+    (u: Member) => u._id !== user._id
   );
   const [message, setMessage] = useState("");
   const [allMessages, setAllMessages] = useState<Message[]>([]);
@@ -39,9 +40,14 @@ function ChatArea() {
         text: message,
       };
 
-      dispatch(showLoader());
+      socket.emit("send-message", {
+        ...newMessage,
+        members: selectedChat.members.map((m: any) => m._id),
+        read: false,
+        createdAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+      });
+
       const response = await createNewMessage(newMessage);
-      dispatch(hideLoader());
 
       if (response.success) {
         setMessage("");
@@ -51,19 +57,19 @@ function ChatArea() {
           if (chat._id === selectedChat._id) {
             return {
               ...chat,
-              lastMessage: response.data, // update last message to the one we just sent
+              lastMessage: {
+                text: message,
+                sender: user._id,
+                createdAt: new Date().toISOString(),
+              },
             };
           }
           return chat;
         });
 
         dispatch(setAllChats(updatedChats));
-
-        // also add message to UI immediately
-        setAllMessages([...allMessages, response.data]);
       }
     } catch (error) {
-      dispatch(hideLoader());
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
@@ -106,10 +112,11 @@ function ChatArea() {
 
   const clearUnreadMessages = async () => {
     try {
-      dispatch(showLoader());
+      socket.emit("clear-unread-messages", {
+        chatId: selectedChat._id,
+        members: selectedChat.members.map((m: any) => m._id),
+      });
       const response = await clearUnreadMessagesCount(selectedChat._id);
-      dispatch(hideLoader());
-
       if (response.success) {
         const updatedChats = allChats.map((chat: any) => {
           if (chat._id === selectedChat._id) {
@@ -124,7 +131,6 @@ function ChatArea() {
         dispatch(setAllChats(updatedChats));
       }
     } catch (error) {
-      dispatch(hideLoader());
       if (error instanceof Error) {
         toast.error(error.message); // Access the 'message' property safely
       } else {
@@ -145,7 +151,50 @@ function ChatArea() {
     if (selectedChat?.lastMessage?.sender !== user._id) {
       clearUnreadMessages();
     }
+
+    socket.on("receive-message", (message: any) => {
+      const selectedChat: any = store.getState().userReducer.selectedChat;
+      if (selectedChat._id === message.chatId) {
+        setAllMessages((prevmsg: any[]) => [...prevmsg, message]);
+      }
+
+      if (selectedChat._id === message.chatId && message.sender !== user._id) {
+        clearUnreadMessages();
+      }
+    });
+    socket.on("message-count-cleared", (data: any) => {
+      const selectedChat: any = store.getState().userReducer.selectedChat;
+      const allChats = store.getState().userReducer.allChats;
+
+      if (selectedChat._id === data.chatId) {
+        //updating unread message count in chat object
+        const updatedChats = allChats.map((chat: any) => {
+          if (chat._id === data.chatId) {
+            return { ...chat, unreadMessageCount: 0 };
+          }
+          return chat;
+        });
+        dispatch(setAllChats(updatedChats));
+
+        //updating read property in message object
+        setAllMessages((prevMsgs) => {
+          return prevMsgs.map((msg) => {
+            return { ...msg, read: true };
+          });
+        });
+      }
+    });
+    return () => {
+      socket.off("receive-message");
+      socket.off("message-count-cleared");
+    };
   }, [selectedChat]);
+
+  useEffect(() => {
+    const msgContainer = document.getElementById("main-chat-area")!;
+
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+  }, [allMessages]);
 
   return (
     <>
@@ -161,7 +210,7 @@ function ChatArea() {
             </span>
           </div>
 
-          <div className="main-chat-area">
+          <div className="main-chat-area" id="main-chat-area">
             {allMessages.map((msg) => {
               const isCurrentUserSender = msg.sender === user._id;
               return (
@@ -193,7 +242,7 @@ function ChatArea() {
                       }
                     >
                       {formatTime(msg.createdAt)}{" "}
-                      {isCurrentUserSender && msg.read && (
+                      {isCurrentUserSender && msg.read === true && (
                         <i
                           className="fa fa-check-circle"
                           aria-hidden="true"
