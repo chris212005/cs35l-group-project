@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const url =
-  import.meta.env.VITE_API_URL || "http://localhost:3000";
+  import.meta.env.VITE_API_URL || "https://bruin-cord.onrender.com";
 
 export const axiosInstance = axios.create();
 
