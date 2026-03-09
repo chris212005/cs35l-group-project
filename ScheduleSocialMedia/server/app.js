@@ -11,8 +11,13 @@ const scheduleRouter = require('./controllers/scheduleController');
 //Use auth controller routers
 const server = require("http").createServer(app);
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://cs35-group-project.onrender.com"
+  ];
+
 const io = require("socket.io")(server, {cors: {
-    origin: "http://localhost:5173", 
+    origin: allowedOrigins, 
     methods: ['GET', 'POST']
 }})
 // accept larger JSON payloads (profile pictures encoded as data URLs can be large)
