@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 //web socket
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3000");
+const socket = io("https://bruin-cord.onrender.com");
 
 //this page represents "home page/index.js"
 
