@@ -4,7 +4,7 @@ dotenv.config({path: './config.env'});
 
 const dbconfig = require('./config/dbConfig');
 
-const port = process.env.PORT_NUMBER || 3000;
+const port = process.env.PORT || 3000;
 
 server.listen(port, () => {
     console.log("Listening to requests on PORT: " + port);
