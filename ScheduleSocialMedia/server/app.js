@@ -13,7 +13,7 @@ const server = require("http").createServer(app);
 
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://cs35-group-project.onrender.com"
+    "https://cs35l-group-project.onrender.com"
   ];
 
   const io = require("socket.io")(server, {
