@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { createNewChat } from "../apiCalls/chat";
 import { hideLoader, showLoader } from "../redux/loaderSlice";
 import { setAllChats, setSelectedChat } from "../redux/usersSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import store from "../redux/store";
 
 type UsersListProps = {
@@ -21,6 +21,19 @@ interface Chat {
 }
 
 export default function UsersList({ searchKey, socket }: UsersListProps) {
+  // modal state for showing user details
+  const [modalUser, setModalUser] = useState<any | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const openProfileModal = (e: React.MouseEvent, user: any) => {
+    e.stopPropagation();
+    setModalUser(user);
+    setModalOpen(true);
+  };
+  const closeProfileModal = () => {
+    setModalOpen(false);
+    setModalUser(null);
+  };
+
   const {
     allUsers,
     allChats,
@@ -237,7 +250,11 @@ export default function UsersList({ searchKey, socket }: UsersListProps) {
 
                 {/* Name + message */}
                 <div className="filter-user-details">
-                  <div className="user-display-name">
+                  <div
+                    className="user-display-name"
+                    onClick={(e) => openProfileModal(e, user)}
+                    style={{ cursor: "pointer" }}
+                  >
                     {user.firstname + " " + user.lastname}
                   </div>
 
@@ -276,6 +293,38 @@ export default function UsersList({ searchKey, socket }: UsersListProps) {
           </div>
         );
       })}
+
+      {/* Modal: user details */}
+      {modalOpen && modalUser && (
+        <div className="user-modal-overlay" onClick={closeProfileModal}>
+          <div className="user-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeProfileModal}>
+              ×
+            </button>
+            <div className="modal-header">
+              {modalUser.profilePic ? (
+                <img
+                  src={modalUser.profilePic}
+                  alt="avatar"
+                  className="modal-avatar-img"
+                />
+              ) : (
+                <div className="modal-avatar">
+                  {modalUser.firstname?.charAt(0).toUpperCase() +
+                    (modalUser.lastname?.charAt(0) || "").toUpperCase()}
+                </div>
+              )}
+              <h2>
+                {modalUser.firstname} {modalUser.lastname}
+              </h2>
+            </div>
+            <div className="modal-body">
+              <div className="modal-email">{modalUser.email}</div>
+              <div className="modal-bio"><strong>Bio:</strong> {modalUser.bio || "No bio"}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

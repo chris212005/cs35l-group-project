@@ -6,9 +6,9 @@ import UsersList from "./userList";
 export default function SideBar({ socket }: { socket: any }) {
   const [searchKey, setSearchKey] = useState("");
   return (
-    <div className="app-sidebar">
+    <aside className="sidebar">
       <Search searchKey={searchKey} setSearchKey={setSearchKey}></Search>
       <UsersList searchKey={searchKey} socket={socket}></UsersList>
-    </div>
+    </aside>
   );
 }
