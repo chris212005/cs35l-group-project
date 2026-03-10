@@ -6,6 +6,8 @@ import TopBar from "../components/TopBar";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser } from "../redux/usersSlice";
 
+const DEFAULT_AVATAR: string | null = null; // no default image — keep empty when user has none
+
 export default function Profile() {
 
   const navigate = useNavigate();
@@ -22,6 +24,8 @@ export default function Profile() {
   // ---------- Profile picture ----------
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [savingPic, setSavingPic] = useState(false);
+  const prevProfileRef = useRef<string | null>(null);
 
   // ---------- Bio ----------
   const [bio, setBio] = useState("");
@@ -31,9 +35,8 @@ export default function Profile() {
   // initialize from Redux currentUser (populated by ProtectedRoute)
   useEffect(() => {
     if (currentUser) {
-      if (currentUser.profilePic) {
-        setProfilePic(currentUser.profilePic);
-      }
+      // prefer user's pic, otherwise keep empty (no default image)
+      setProfilePic(currentUser.profilePic ?? DEFAULT_AVATAR);
       if (currentUser.bio) {
         setBio(currentUser.bio);
         setDraftBio(currentUser.bio);
@@ -55,7 +58,11 @@ export default function Profile() {
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = String(reader.result || "");
+      // optimistic update: store previous, update local and redux immediately
+      prevProfileRef.current = profilePic;
       setProfilePic(dataUrl);
+      setSavingPic(true);
+      dispatch(setUser({ ...(currentUser || {}), profilePic: dataUrl }));
 
       // Persist to server
       (async () => {
@@ -74,12 +81,17 @@ export default function Profile() {
             dispatch(setUser(json.data));
           } else {
             // server didn't return success, keep the selected image in local UI
-            setProfilePic(dataUrl);
+            // keep optimistic UI but update redux back to previous if desired
+            dispatch(setUser({ ...(currentUser || {}), profilePic: prevProfileRef.current }));
+            setProfilePic(prevProfileRef.current);
           }
         } catch (error) {
           console.error("Error updating profile picture:", error);
-          // keep the selected image locally on error
-          setProfilePic(dataUrl);
+          // rollback on error
+          dispatch(setUser({ ...(currentUser || {}), profilePic: prevProfileRef.current }));
+          setProfilePic(prevProfileRef.current);
+        } finally {
+          setSavingPic(false);
         }
       })();
     };
@@ -131,6 +143,48 @@ export default function Profile() {
   const handleCancelBio = () => {
     setDraftBio(bio);
     setEditingBio(false);
+  };
+
+  // Reset profile picture to default (no confirm)
+  const handleResetProfilePic = async () => {
+    // nothing to do if user doesn't have an image
+    if (!profilePic) return;
+
+    // optimistic update + rollback on error
+    const prev = profilePic;
+    prevProfileRef.current = prev;
+    setProfilePic(null);
+    setSavingPic(true);
+    dispatch(setUser({ ...(currentUser || {}), profilePic: "" }));
+
+    try {
+      const token = localStorage.getItem("token");
+      const resp = await fetch("/api/user/update-profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ profilePic: "" }),
+      });
+      const json = await resp.json();
+      if (json && json.success) {
+        dispatch(setUser(json.data));
+        setProfilePic(json.data.profilePic ?? null);
+      } else {
+        console.error("Reset avatar failed:", json);
+        // rollback
+        dispatch(setUser({ ...(currentUser || {}), profilePic: prev }));
+        setProfilePic(prev);
+      }
+    } catch (error) {
+      console.error("Error resetting profile picture:", error);
+      // rollback
+      dispatch(setUser({ ...(currentUser || {}), profilePic: prev }));
+      setProfilePic(prev);
+    } finally {
+      setSavingPic(false);
+    }
   };
 
   return (
@@ -217,8 +271,19 @@ export default function Profile() {
                   className="primaryBtn"
                   type="button"
                   onClick={handleUploadClick}
+                  disabled={savingPic}
                 >
                   📷 Upload Photo
+                </button>
+
+                <button
+                  className="primaryBtn"
+                  type="button"
+                  onClick={handleResetProfilePic}
+                  style={{ marginLeft: 8, background: "#9ca3af" }}
+                  disabled={!profilePic || savingPic}
+                >
+                  Reset to default
                 </button>
 
                 {/* hidden file input */}
