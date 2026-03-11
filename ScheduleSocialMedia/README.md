@@ -26,6 +26,16 @@ Install backend dependencies:
 cd schedulesocialmedia/server
 npm install
 
+## Environment Setup
+
+Create a file called `config.env` in the `ScheduleSocialMedia/server` folder with the following:
+```
+PORT_NUMBER=3000
+CONN_STRING=mongodb+srv://JaredFellin:Fellin567@cluster0.hwdplrz.mongodb.net/quick-chat
+SECRET_KEY=quick-chat-server
+```
+
+
 ## How to run our app
 
 First run the back end by opening a terminal 
