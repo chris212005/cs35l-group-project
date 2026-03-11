@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
 
 import Profile from "./pages/Profile";
-import Messaging from "./pages/Messaging";
 import Login from "./pages/Login_SignUp";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -35,14 +34,6 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Profile />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/messaging" 
-          element={
-            <ProtectedRoute>
-              <Messaging />
             </ProtectedRoute>
           } 
         />

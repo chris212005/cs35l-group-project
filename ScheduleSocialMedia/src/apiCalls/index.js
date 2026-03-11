@@ -1,5 +1,8 @@
 import axios from "axios";
 
+export const url =
+  import.meta.env.VITE_API_URL || "https://bruincord.onrender.com";
+
 export const axiosInstance = axios.create();
 
 axiosInstance.interceptors.request.use(
