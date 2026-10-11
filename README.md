@@ -10,7 +10,7 @@
 ---
 
 ## Project Overview
-Schedule Connect is a web application designed to help UCLA students meet new people and coordinate hangouts by comparing class schedules and identifying shared free time.
+BruinCord is a web application designed to help UCLA students meet new people and coordinate hangouts by comparing class schedules and identifying shared free time.
 
 Many students struggle to make friends or plan meetups due to busy and mismatched schedules. Our app allows users to upload their schedules, follow other students, compare availability, and message one another based on overlapping free time.
 
